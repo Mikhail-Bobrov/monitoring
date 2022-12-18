@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: {{ .Values.nodeExporter.name }}
+  name: {{ .Values.nodeExporter.name }}
+  namespace: {{ .Values.nodeExporter.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.nodeExporter.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nodeExporter.name }}
+    spec:
+      containers:
+      - args:
+        - --path.rootfs=/host
+        - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run)($|/)
+        image: {{ .Values.nodeExporter.image.repo -}}/{{- .Values.nodeExporter.image.name -}}:{{- .Values.nodeExporter.image.tag }}
+        imagePullPolicy: IfNotPresent
+        name: {{ .Values.nodeExporter.name }}
+        resources:
+          limits:
+            cpu: {{ .Values.nodeExporter.resources.limit_cpu }}
+            memory: {{ .Values.nodeExporter.resources.limit_memory }}
+          requests:
+            cpu: {{ .Values.nodeExporter.resources.request_cpu }}
+            memory: {{ .Values.nodeExporter.resources.request_memory }}
+        volumeMounts:
+        - mountPath: /host
+          name: sys
+          readOnly: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      volumes:
+      - hostPath:
+          path: /
+          type: ""
+        name: sys
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate

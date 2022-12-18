@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ .Values.kubeState.name }}
+  name: {{ .Values.kubeState.name }}
+  namespace: {{ .Values.kubeState.namespace }}
+spec:
+  ports:
+  - name: {{ .Values.kubeState.name }}
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: {{ .Values.kubeState.service.name }}
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app: {{ .Values.kubeState.name }}
+  type: ClusterIP
+status:
+  loadBalancer: {}

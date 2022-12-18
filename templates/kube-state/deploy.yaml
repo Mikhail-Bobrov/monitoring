@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.kubeState.name }}
+  name: {{ .Values.kubeState.name }}
+  namespace: {{ .Values.kubeState.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.kubeState.name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.kubeState.name }}
+    spec:
+      containers:
+      - image: {{ .Values.kubeState.image.repo -}}/{{- .Values.kubeState.image.name -}}:{{- .Values.kubeState.image.tag }}
+        name: {{ .Values.kubeState.name }}
+        ports:
+        - containerPort: 8080
+          name: {{ .Values.kubeState.service.nameMetrics }}
+          protocol: TCP
+        - containerPort: 8081
+          name: {{ .Values.kubeState.service.name}}
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.kubeState.resources.limit_cpu }}
+            memory: {{ .Values.kubeState.resources.limit_memory }}
+          requests:
+            cpu: {{ .Values.kubeState.resources.request_cpu }}
+            memory: {{ .Values.kubeState.resources.request_memory }}
+      serviceAccountName: {{ .Values.kubeState.name }}
+

@@ -1,0 +1,37 @@
+# Default values for kube-state.
+kubeState:
+  name: kube-state-metrics
+  namespace: mon
+  service:
+    name: telemetry
+    nameMetrics: http-metrics
+  image:
+    repo: k8s.gcr.io
+    tag: v2.5.0
+    name: kube-state-metrics/kube-state-metrics
+  resources:
+    limit_cpu: 200m
+    request_cpu: 50m
+    limit_memory: 500Mi
+    request_memory: 200Mi
+
+
+
+
+
+
+# Default values for node-exporter.
+nodeExporter:
+  name: node-exporter
+  labels: node-exporter
+  namespace: mon
+  image:
+    repo: prom
+    name: node-exporter
+    tag: v1.5.0
+  resources:
+    limit_cpu: 100m
+    request_cpu: 50m
+    limit_memory: 200Mi
+    request_memory: 100Mi
+
