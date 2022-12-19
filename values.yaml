@@ -16,10 +16,6 @@ kubeState:
     request_memory: 200Mi
 
 
-
-
-
-
 # Default values for node-exporter.
 nodeExporter:
   name: node-exporter
@@ -35,3 +31,22 @@ nodeExporter:
     limit_memory: 200Mi
     request_memory: 100Mi
 
+# Default values for prometheus.
+prometheus:
+  name: prometheus
+  namespace: mon
+  image:
+    repo: prom
+    name: prometheus
+    tag: v2.40.2
+  configMapName: prometheus-config
+  retentionPeriod: 2h
+  storageClass: lvm-ssd
+  storagePvc: 10Gi
+  resources:
+    limit_cpu: 1
+    request_cpu: 500m
+    limit_memory: 1024Mi
+    request_memory: 1024Mi
+####### config can be empty/all/federate/my-values ############   
+  config: empty
