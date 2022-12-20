@@ -1,0 +1,70 @@
+{{- if .Values.alertmanager.enable }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.alertmanager.name }}
+  namespace: {{ .Values.alertmanager.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.alertmanager.name }}
+  serviceName: {{ .Values.alertmanager.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.alertmanager.name }}
+        stack: monitoring
+      name: {{ .Values.alertmanager.name }}
+    spec:
+      containers:
+      - image: prom/alertmanager:v0.24.0
+        name: {{ .Values.alertmanager.name }}
+        args:
+          - "--config.file=/etc/alertmanager/manager.yaml"
+          - "--storage.path=/var/lib/alertmanager/data"
+        ports:
+        - name: {{ .Values.alertmanager.name }}
+          containerPort: 9093
+        resources:
+          limits:
+            cpu: {{ .Values.alertmanager.resources.limit_cpu }}
+            memory: {{ .Values.alertmanager.resources.limit_memory }}
+          requests:
+            cpu: {{ .Values.alertmanager.resources.request_cpu }}
+            memory: {{ .Values.alertmanager.resources.request_memory }}
+        volumeMounts:
+        - mountPath: /etc/alertmanager/
+          name: configs-files
+        - mountPath: /var/lib/alertmanager/data
+          name: data-alertmanager
+      volumes:
+      - name: configs-files
+        projected:
+          defaultMode: 420
+          sources:
+          - configMap:
+              name: {{ .Values.alertmanager.name }}-config
+          - configMap:
+              name: {{ .Values.alertmanager.name }}-template
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.alertmanager.name }}
+      name: data-alertmanager
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.alertmanager.storagePvc }}
+      storageClassName: {{ .Values.alertmanager.storageClass }}
+
+{{- end }}

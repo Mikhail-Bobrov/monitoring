@@ -1,0 +1,21 @@
+{{- if .Values.alertmanager.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ .Values.alertmanager.name }}
+  name: {{ .Values.alertmanager.name }}
+  namespace: {{ .Values.alertmanager.namespace }}
+spec:
+  ports:
+  - name: {{ .Values.alertmanager.name }}
+    port: 9093
+    protocol: TCP
+    targetPort: 9093
+  selector:
+    app: {{ .Values.alertmanager.name }}
+  type: ClusterIP
+status:
+  loadBalancer: {}
+{{- end }}

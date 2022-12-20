@@ -18,6 +18,7 @@ kubeState:
 
 # Default values for node-exporter.
 nodeExporter:
+  enable: true
   name: node-exporter
   labels: node-exporter
   namespace: mon
@@ -48,5 +49,23 @@ prometheus:
     request_cpu: 500m
     limit_memory: 1024Mi
     request_memory: 1024Mi
-####### config can be empty/all/federate/my-values ############   
+####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
   config: empty
+  
+
+
+alertmanager:
+  enable: true
+  name: alertmanager
+  namespace: mon
+  image:
+    repo: prom
+    name: alertmanager
+    tag: v0.24.0
+  resources:
+    limit_cpu: 500m
+    request_cpu: 200m
+    limit_memory: 512Mi
+    request_memory: 256Mi
+  storageClass: lvm-ssd
+  storagePvc: 1Gi

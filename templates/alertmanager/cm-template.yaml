@@ -1,0 +1,10 @@
+{{- if .Values.alertmanager.enable }}
+apiVersion: v1
+data:
+  custom.tmpl: ""
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: {{ .Values.alertmanager.name }}-template
+  namespace: {{ .Values.alertmanager.namespace }}
+{{- end }}
