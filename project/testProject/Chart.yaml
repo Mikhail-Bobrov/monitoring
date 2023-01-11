@@ -11,11 +11,11 @@ nodeExporter:
 
 alertmanager:
   enable: true
-  template: false
+  template: empty
   storageClass: standard-rwo
 
 prometheus:
-  config: empty
+  config: all
   storageClass: standard-rwo
   resources:
     limit_cpu: 200m

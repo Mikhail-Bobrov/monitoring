@@ -41,7 +41,7 @@ data:
         {{- end }}
         {{- end }} `}}
 {{- end }}
-{{- if eq .Values.prometheus.config "false" }}
+{{- if eq .Values.prometheus.config "empty" }}
   custom.tmpl: ""
 {{- end }}
 kind: ConfigMap
