@@ -6,9 +6,17 @@ nodeExporter:
   resources:
     limit_cpu: 50m
     request_cpu: 50m
-    limit_memory: 1000Mi
-    request_memory: 1000Mi
+    limit_memory: 100Mi
+    request_memory: 100Mi
 
+alertmanager:
+  enable: true
+  template: false
+  storageClass: standard-rwo
 
-
-
+prometheus:
+  config: empty
+  storageClass: standard-rwo
+  resources:
+    limit_cpu: 200m
+    limit_memory: 500Mi

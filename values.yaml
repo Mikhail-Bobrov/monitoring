@@ -10,10 +10,10 @@ kubeState:
     tag: v2.5.0
     name: kube-state-metrics/kube-state-metrics
   resources:
-    limit_cpu: 200m
+    limit_cpu: 100m
     request_cpu: 50m
-    limit_memory: 500Mi
-    request_memory: 200Mi
+    limit_memory: 200Mi
+    request_memory: 100Mi
 
 
 # Default values for node-exporter.
@@ -27,10 +27,10 @@ nodeExporter:
     name: node-exporter
     tag: v1.5.0
   resources:
-    limit_cpu: 100m
+    limit_cpu: 50m
     request_cpu: 50m
-    limit_memory: 200Mi
-    request_memory: 100Mi
+    limit_memory: 100Mi
+    request_memory: 50Mi
 
 # Default values for prometheus.
 prometheus:
@@ -40,15 +40,15 @@ prometheus:
     repo: prom
     name: prometheus
     tag: v2.40.2
-  configMapName: prometheus-config
+  configManName: prometheus-config
   retentionPeriod: 2h
   storageClass: lvm-ssd
   storagePvc: 10Gi
   resources:
-    limit_cpu: 1
-    request_cpu: 500m
-    limit_memory: 1024Mi
-    request_memory: 1024Mi
+    limit_cpu: 400m
+    request_cpu: 100m
+    limit_memory: 800Mi
+    request_memory: 424Mi
 ####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
   config: empty
   
@@ -56,6 +56,7 @@ prometheus:
 
 alertmanager:
   enable: true
+  template: true
   name: alertmanager
   namespace: mon
   image:

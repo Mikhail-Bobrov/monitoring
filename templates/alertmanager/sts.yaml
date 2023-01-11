@@ -17,6 +17,11 @@ spec:
         stack: monitoring
       name: {{ .Values.alertmanager.name }}
     spec:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        runAsNonRoot: true
       containers:
       - image: prom/alertmanager:v0.24.0
         name: {{ .Values.alertmanager.name }}
