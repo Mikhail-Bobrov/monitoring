@@ -10,7 +10,7 @@ nodeExporter:
     request_memory: 100Mi
 
 alertmanager:
-  enable: true
+  enable: false
   template: empty
   storageClass: standard-rwo
 
@@ -20,3 +20,8 @@ prometheus:
   resources:
     limit_cpu: 200m
     limit_memory: 500Mi
+
+grafana:
+  enable: true
+  pvc:
+    storageClass: standard-rwo

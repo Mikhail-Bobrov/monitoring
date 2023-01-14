@@ -70,3 +70,15 @@ alertmanager:
     request_memory: 256Mi
   storageClass: lvm-ssd
   storagePvc: 1Gi
+
+grafana:
+  enable: true
+  name: grafana
+  namespace: mon
+  secret:
+    user: admin
+    pass: admin
+  pvc:
+    name: grafana
+    storage: 1G
+    storageClass: standart
