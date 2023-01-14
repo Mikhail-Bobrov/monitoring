@@ -1,5 +1,4 @@
-{{- if .Values.grafana.enable }}
-{{- if .Values.grafana.serviceLb }}
+{{- if and .Values.grafana.enable .Values.grafana.serviceLb }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -19,5 +18,4 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
-{{- end }}
 {{- end }}
