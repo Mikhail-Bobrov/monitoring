@@ -25,3 +25,4 @@ grafana:
   enable: true
   pvc:
     storageClass: standard-rwo
+  serviceLb: false

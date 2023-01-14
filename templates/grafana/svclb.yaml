@@ -1,0 +1,23 @@
+{{- if .Values.grafana.enable }}
+{{- if .Values.grafana.serviceLb }}
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name -}}-lb
+  namespace: {{ .Values.grafana.namespace }}
+spec:
+  ports:
+  - name: {{ .Values.grafana.name }}
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: {{ .Values.grafana.name }}
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+{{- end }}
+{{- end }}

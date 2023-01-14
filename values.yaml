@@ -82,3 +82,4 @@ grafana:
     name: grafana
     storage: 1G
     storageClass: standart
+  serviceLb: true
