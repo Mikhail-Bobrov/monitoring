@@ -1,3 +1,8 @@
+# # Default values non system
+
+value:
+  federate: false
+
 # Default values for kube-state.
 kubeState:
   name: kube-state-metrics
@@ -10,18 +15,15 @@ kubeState:
     tag: v2.5.0
     name: kube-state-metrics/kube-state-metrics
   resources:
-    limit_cpu: 200m
+    limit_cpu: 100m
     request_cpu: 50m
-    limit_memory: 500Mi
-    request_memory: 200Mi
-
-
-
-
+    limit_memory: 200Mi
+    request_memory: 100Mi
 
 
 # Default values for node-exporter.
 nodeExporter:
+  enable: true
   name: node-exporter
   labels: node-exporter
   namespace: mon
@@ -30,8 +32,61 @@ nodeExporter:
     name: node-exporter
     tag: v1.5.0
   resources:
-    limit_cpu: 100m
+    limit_cpu: 50m
     request_cpu: 50m
-    limit_memory: 200Mi
-    request_memory: 100Mi
+    limit_memory: 100Mi
+    request_memory: 50Mi
 
+# Default values for prometheus.
+prometheus:
+  name: prometheus
+  namespace: mon
+  image:
+    repo: prom
+    name: prometheus
+    tag: v2.40.2
+  configManName: prometheus-config
+  retentionPeriod: 2h
+  storageClass: lvm-ssd
+  storagePvc: 10Gi
+  resources:
+    limit_cpu: 400m
+    request_cpu: 100m
+    limit_memory: 800Mi
+    request_memory: 424Mi
+####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
+  config: empty
+  
+
+# Default values for alertmanager
+alertmanager:
+  enable: true
+  template: true
+  name: alertmanager
+  namespace: mon
+  image:
+    repo: prom
+    name: alertmanager
+    tag: v0.24.0
+  resources:
+    limit_cpu: 500m
+    request_cpu: 200m
+    limit_memory: 512Mi
+    request_memory: 256Mi
+  storageClass: lvm-ssd
+  storagePvc: 1Gi
+
+# Default values for grafana
+
+grafana:
+  enable: true
+  name: grafana
+  namespace: mon
+  secret:
+    user: admin
+    pass: admin
+  pvc:
+    name: grafana
+    storage: 1G
+    storageClass: standart
+  serviceLb: true

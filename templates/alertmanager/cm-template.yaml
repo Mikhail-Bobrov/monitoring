@@ -1,0 +1,52 @@
+{{- if .Values.alertmanager.enable }}
+apiVersion: v1
+data:
+{{- if .Values.alertmanager.template  }}
+  custom.tmpl: |
+{{`
+        {{ define "telegram.custom.message" }}
+        {{ if gt (len .Alerts.Firing) 0 }}
+        🚨🚨 FIRING ALERTS 🚨🚨
+        {{- range .Alerts.Firing }}
+        💥💥💥 <b>{{ .Labels.alertname }}</b> 💥💥💥
+          {{ .Annotations.message }}
+          {{- range $key, $value := .Labels }}
+                {{- if ne $key "alertname" }}
+                🔹 {{ $key }}: {{ $value }}
+                {{- end }}
+          {{- end }}
+          {{- range $key, $value := .Annotations }}
+                {{- if ne $key "message" }}
+                🔸 {{ $key }}: {{ $value }}
+                {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+        {{ if gt (len .Alerts.Resolved) 0 }}
+        ✅✅ RESOLVED ALERTS ✅✅
+        {{- range .Alerts.Resolved }}
+        🟢🟢🟢 <b>{{ .Labels.alertname }}</b> 🟢🟢🟢
+          {{ .Annotations.message }}
+          {{- range $key, $value := .Labels }}
+                {{- if ne $key "alertname" }}
+                🔹 {{ $key }}: {{ $value }}
+                {{-  end }}
+          {{- end }}
+          {{- range $key, $value := .Annotations }}
+                {{- if ne $key "message" }}
+                🔸 {{ $key }}: {{ $value }}
+                {{- end}}
+          {{- end}}
+        {{- end }}
+        {{- end }}
+        {{- end }} `}}
+{{- end }}
+{{- if eq .Values.prometheus.config "empty" }}
+  custom.tmpl: ""
+{{- end }}
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: {{ .Values.alertmanager.name }}-template
+  namespace: {{ .Values.alertmanager.namespace }}
+{{- end }}

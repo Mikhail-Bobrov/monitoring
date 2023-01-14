@@ -1,3 +1,4 @@
+{{- if .Values.nodeExporter.enable }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -44,3 +45,4 @@ spec:
       maxSurge: 0
       maxUnavailable: 1
     type: RollingUpdate
+{{- end }}

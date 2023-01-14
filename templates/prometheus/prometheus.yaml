@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ .Values.prometheus.name }}
+  name: {{ .Values.prometheus.name }}
+  namespace: {{ .Values.prometheus.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.prometheus.name }}
+  serviceName: {{ .Values.prometheus.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.prometheus.name }}
+    spec:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        runAsNonRoot: true
+      containers:
+      - image: {{ .Values.prometheus.image.repo -}}/{{- .Values.prometheus.image.name -}}:{{- .Values.prometheus.image.tag }}
+        ports:
+          - containerPort: 9090
+        imagePullPolicy: IfNotPresent
+        args:
+        - --storage.tsdb.retention.time={{- .Values.prometheus.retentionPeriod }}
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/var/lib/prom/
+        name: {{ .Values.prometheus.name }}
+        resources:
+          limits:
+            cpu: {{ .Values.prometheus.resources.limit_cpu | quote }}
+            memory: {{ .Values.prometheus.resources.limit_memory }}
+          requests:
+            cpu: {{ .Values.prometheus.resources.request_cpu }}
+            memory: {{ .Values.prometheus.resources.request_memory }}
+        volumeMounts:
+        - mountPath: /etc/prometheus/
+          name: configs-files
+        - mountPath: /var/lib/prom/
+          name: data-prometheus
+      restartPolicy: Always
+      serviceAccountName: {{ .Values.prometheus.name }}
+      volumes:
+        - name: configs-files
+          configMap:
+              name: {{ .Values.prometheus.configManName }}
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.prometheus.name }}
+      name: data-prometheus
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.prometheus.storagePvc }}
+      storageClassName: {{ .Values.prometheus.storageClass }}
