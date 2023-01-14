@@ -22,7 +22,7 @@ prometheus:
     limit_memory: 500Mi
 
 grafana:
-  enable: true
+  enable: false
   pvc:
     storageClass: standard-rwo
-  serviceLb: false
+  serviceLb: true

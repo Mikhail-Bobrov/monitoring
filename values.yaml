@@ -1,3 +1,8 @@
+# # Default values non system
+
+value:
+  federate: false
+
 # Default values for kube-state.
 kubeState:
   name: kube-state-metrics
@@ -53,7 +58,7 @@ prometheus:
   config: empty
   
 
-
+# Default values for alertmanager
 alertmanager:
   enable: true
   template: true
@@ -70,6 +75,8 @@ alertmanager:
     request_memory: 256Mi
   storageClass: lvm-ssd
   storagePvc: 1Gi
+
+# Default values for grafana
 
 grafana:
   enable: true
