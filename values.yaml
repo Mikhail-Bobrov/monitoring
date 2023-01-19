@@ -94,6 +94,6 @@ grafana:
 # Default values for blackbox
 
 blackbox:
-  enable: true
+  enable: false
   name: blackbox
   namespace: mon

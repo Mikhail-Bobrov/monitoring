@@ -1,4 +1,4 @@
-{{- if .Values.grafana.enable }}
+{{- if .Values.blackbox.enable }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

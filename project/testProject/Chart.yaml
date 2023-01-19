@@ -1,5 +1,5 @@
 name: monitoring
-version: 0.1.0
+version: 0.2
 
 nodeExporter:
   name: node-exporter
@@ -28,4 +28,4 @@ grafana:
   serviceLb: true
 
 blackbox:
-  enable: true
+  enable: false

@@ -1,4 +1,4 @@
-{{- if .Values.grafana.enable }}
+{{- if .Values.blackbox.enable }}
 apiVersion: v1
 kind: Service
 metadata:
