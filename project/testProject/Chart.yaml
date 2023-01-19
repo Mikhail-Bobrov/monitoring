@@ -26,3 +26,6 @@ grafana:
   pvc:
     storageClass: standard-rwo
   serviceLb: true
+
+blackbox:
+  enable: true

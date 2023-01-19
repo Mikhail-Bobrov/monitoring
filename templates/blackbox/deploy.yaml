@@ -1,0 +1,42 @@
+{{- if .Values.grafana.enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ .Values.blackbox.name }}
+  name: {{ .Values.blackbox.name }}
+  namespace: {{ .Values.blackbox.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.blackbox.name }}
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.blackbox.name }}
+    spec:
+      containers:
+      - image: prom/blackbox-exporter:v0.23.0
+        name: {{ .Values.blackbox.name }}-exporter
+        args:
+          - "--config.file=/config/blackbox.yaml"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+        volumeMounts:
+            - mountPath: /config
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Values.blackbox.name }}-config
+status: {}
+{{- end }}

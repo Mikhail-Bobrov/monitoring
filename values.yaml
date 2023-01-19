@@ -90,3 +90,10 @@ grafana:
     storage: 1G
     storageClass: standart
   serviceLb: true
+
+# Default values for blackbox
+
+blackbox:
+  enable: true
+  name: blackbox
+  namespace: mon
