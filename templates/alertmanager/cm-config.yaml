@@ -22,5 +22,4 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   name: {{ .Values.alertmanager.name }}-config
-  namespace: {{ .Values.alertmanager.namespace }}
 {{- end }}

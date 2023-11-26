@@ -6,7 +6,6 @@ value:
 # Default values for kube-state.
 kubeState:
   name: kube-state-metrics
-  namespace: mon
   service:
     name: telemetry
     nameMetrics: http-metrics
@@ -26,7 +25,6 @@ nodeExporter:
   enable: true
   name: node-exporter
   labels: node-exporter
-  namespace: mon
   image:
     repo: prom
     name: node-exporter
@@ -40,7 +38,6 @@ nodeExporter:
 # Default values for prometheus.
 prometheus:
   name: prometheus
-  namespace: mon
   image:
     repo: prom
     name: prometheus
@@ -48,7 +45,7 @@ prometheus:
   configManName: prometheus-config
   retentionPeriod: 2h
   storageClass: lvm-ssd
-  storagePvc: 10Gi
+  storagePvc: 1Gi
   resources:
     limit_cpu: 400m
     request_cpu: 100m
@@ -63,7 +60,6 @@ alertmanager:
   enable: true
   template: true
   name: alertmanager
-  namespace: mon
   image:
     repo: prom
     name: alertmanager
@@ -81,7 +77,6 @@ alertmanager:
 grafana:
   enable: true
   name: grafana
-  namespace: mon
   secret:
     user: admin
     pass: admin
@@ -96,4 +91,3 @@ grafana:
 blackbox:
   enable: false
   name: blackbox
-  namespace: mon

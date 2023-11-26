@@ -6,7 +6,6 @@ metadata:
   labels:
     app: {{ .Values.blackbox.name }}
   name: {{ .Values.blackbox.name }}
-  namespace: {{ .Values.blackbox.namespace }}
 spec:
   replicas: 1
   selector:

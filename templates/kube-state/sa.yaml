@@ -3,4 +3,3 @@ kind: ServiceAccount
 metadata:
   creationTimestamp: null
   name: {{ .Values.kubeState.name }}
-  namespace: {{ .Values.kubeState.namespace }}

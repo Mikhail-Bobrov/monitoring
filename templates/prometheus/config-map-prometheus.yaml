@@ -4,7 +4,6 @@ metadata:
   name: {{ .Values.prometheus.configManName }}
   labels:
     name: {{ .Values.prometheus.name }}
-  namespace: {{ .Values.prometheus.namespace }}
 data:
 {{- if eq .Values.prometheus.config "all" }}
   prometheus.yml: |-

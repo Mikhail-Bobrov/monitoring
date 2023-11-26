@@ -22,5 +22,4 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   name: {{ .Values.blackbox.name }}-config
-  namespace: {{ .Values.blackbox.namespace }}
 {{- end }}

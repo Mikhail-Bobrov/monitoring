@@ -5,7 +5,6 @@ metadata:
   labels:
     app: {{ .Values.grafana.name }}
   name: {{ .Values.grafana.name }}
-  namespace: {{ .Values.grafana.namespace }}
 spec:
   ports:
   - name: {{ .Values.grafana.name }}

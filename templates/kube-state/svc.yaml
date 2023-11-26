@@ -5,7 +5,6 @@ metadata:
   labels:
     app: {{ .Values.kubeState.name }}
   name: {{ .Values.kubeState.name }}
-  namespace: {{ .Values.kubeState.namespace }}
 spec:
   ports:
   - name: {{ .Values.kubeState.name }}

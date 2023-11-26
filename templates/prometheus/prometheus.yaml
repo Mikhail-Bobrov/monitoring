@@ -4,7 +4,6 @@ metadata:
   labels:
     app: {{ .Values.prometheus.name }}
   name: {{ .Values.prometheus.name }}
-  namespace: {{ .Values.prometheus.namespace }}
 spec:
   selector:
     matchLabels:

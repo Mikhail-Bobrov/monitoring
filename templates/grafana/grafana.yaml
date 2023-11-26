@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.grafana.name }}
-  namespace: {{ .Values.grafana.namespace }}
   labels:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/instance: grafana

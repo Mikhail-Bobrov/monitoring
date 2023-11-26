@@ -4,7 +4,6 @@ metadata:
   labels:
     app: {{ .Values.kubeState.name }}
   name: {{ .Values.kubeState.name }}
-  namespace: {{ .Values.kubeState.namespace }}
 spec:
   selector:
     matchLabels:

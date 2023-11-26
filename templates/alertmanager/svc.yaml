@@ -6,7 +6,6 @@ metadata:
   labels:
     app: {{ .Values.alertmanager.name }}
   name: {{ .Values.alertmanager.name }}
-  namespace: {{ .Values.alertmanager.namespace }}
 spec:
   ports:
   - name: {{ .Values.alertmanager.name }}
