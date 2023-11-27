@@ -1,0 +1,19 @@
+{{- if .Values.grafana.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name }}
+spec:
+  ports:
+  - name: {{ .Values.grafana.name }}
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: {{ .Values.grafana.name }}
+  type: ClusterIP
+status:
+  loadBalancer: {}
+{{- end }}

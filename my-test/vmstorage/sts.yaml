@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"labels":{"app":"vmstorage"},"name":"vmstorage","namespace":"mon"},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"vmstorage"}},"serviceName":"vmstorage","template":{"metadata":{"labels":{"app":"vmstorage","component":"vmstorage","stack":"monitoring"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"node-role.kubernetes.io/monitoring","operator":"In","values":["true"]}]},"weight":100},{"preference":{"matchExpressions":[{"key":"node-role.kubernetes.io/worker","operator":"In","values":["true"]}]},"weight":10}]},"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app":"victoria"}},"namespaces":["mon"],"topologyKey":"kubernetes.io/hostname"},"weight":1}]}},"containers":[{"args":["-envflag.enable"],"env":[{"name":"storageDataPath","value":"/vmstorage-data/vmstorage"}],"image":"infra/victoria-vmstorage:v1.77.2-cluster-2022-06-14-0f945a72","imagePullPolicy":"IfNotPresent","name":"vmstorage","resources":{"limits":{"cpu":"3","memory":"6G"},"requests":{"cpu":"0.1","memory":"1G"}},"volumeMounts":[{"mountPath":"/vmstorage-data/","name":"data-victoria"}]}],"imagePullSecrets":[{"name":"docker-registry-secret"}],"tolerations":[{"key":"role_maas","operator":"Exists"},{"key":"role_ceph","operator":"Exists"},{"key":"role_ceph_mon","operator":"Exists"},{"key":"role_ceph_osd","operator":"Exists"},{"key":"role_va","operator":"Exists"},{"key":"role_backend","operator":"Exists"},{"key":"role_monitoring","operator":"Exists"},{"key":"role_balancer","operator":"Exists"},{"key":"role_nvidia","operator":"Exists"},{"key":"node.kubernetes.io/not-ready","operator":"Exists"},{"key":"node.cloudprovider.kubernetes.io/uninitialized","operator":"Exists"}]}},"volumeClaimTemplates":[{"metadata":{"labels":{"app":"vmstorage"},"name":"data-victoria"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"100Gi"}},"storageClassName":"csi-rbd"}}]}}
+  creationTimestamp: "2022-09-15T18:45:07Z"
+  generation: 10
+  labels:
+    app: vmstorage
+  name: vmstorage
+  namespace: mon
+  resourceVersion: "1085728831"
+  uid: d1a90219-795c-4e8c-9bc8-7974fce2fb27
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: vmstorage
+  serviceName: vmstorage
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vmstorage
+        component: vmstorage
+        stack: monitoring
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/monitoring
+                operator: In
+                values:
+                - "true"
+            weight: 100
+          - preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                - "true"
+            weight: 10
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: victoria
+              namespaces:
+              - mon
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - args:
+        - -envflag.enable
+        env:
+        - name: storageDataPath
+          value: /vmstorage-data/vmstorage
+        image: infra/victoria-vmstorage:v1.77.2-cluster-2022-06-14-0f945a72
+        imagePullPolicy: IfNotPresent
+        name: vmstorage
+        resources:
+          limits:
+            cpu: "3"
+            memory: 6G
+          requests:
+            cpu: 100m
+            memory: 1G
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /vmstorage-data/
+          name: data-victoria
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: docker-registry-secret
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - key: role_maas
+        operator: Exists
+      - key: role_ceph
+        operator: Exists
+      - key: role_ceph_mon
+        operator: Exists
+      - key: role_ceph_osd
+        operator: Exists
+      - key: role_va
+        operator: Exists
+      - key: role_backend
+        operator: Exists
+      - key: role_monitoring
+        operator: Exists
+      - key: role_balancer
+        operator: Exists
+      - key: role_nvidia
+        operator: Exists
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+      - key: node.cloudprovider.kubernetes.io/uninitialized
+        operator: Exists
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vmstorage
+      name: data-victoria
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: csi-rbd
+      volumeMode: Filesystem
+    status:
+      phase: Pending
+status:
+  availableReplicas: 1
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: vmstorage-795d87b9
+  observedGeneration: 10
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: vmstorage-795d87b9
+  updatedReplicas: 1

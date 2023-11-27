@@ -1,0 +1,15 @@
+{{- if .Values.grafana.enable }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.grafana.pvc.name }}
+  finalizers:
+    - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ .Values.grafana.pvc.storage }}
+  storageClassName: {{ .Values.grafana.pvc.storageClass }}
+{{- end }}

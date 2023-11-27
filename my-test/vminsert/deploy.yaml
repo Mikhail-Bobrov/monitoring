@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"vminsert"},"name":"vminsert","namespace":"mon"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"vminsert"}},"template":{"metadata":{"labels":{"app":"vminsert","component":"vminsert","stack":"monitoring"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"node-role.kubernetes.io/monitoring","operator":"In","values":["true"]}]},"weight":100},{"preference":{"matchExpressions":[{"key":"node-role.kubernetes.io/worker","operator":"In","values":["true"]}]},"weight":10}]}},"containers":[{"args":["-envflag.enable","-maxLabelsPerTimeseries=60"],"env":[{"name":"storageNode","value":"vmstorage-0.vmstorage.mon.svc.cluster.local:8400,vmstorage-1.vmstorage.mon.svc.cluster.local:8400,vmstorage-2.vmstorage.mon.svc.cluster.local:8400"}],"image":"infra/victoria-vminsert:v1.77.2-cluster-2022-06-14-c9e18991","imagePullPolicy":"IfNotPresent","name":"vminsert","resources":{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"0.1","memory":"256M"}}}],"imagePullSecrets":[{"name":"docker-registry-secret"}],"tolerations":[{"key":"role_maas","operator":"Exists"},{"key":"role_ceph","operator":"Exists"},{"key":"role_ceph_mon","operator":"Exists"},{"key":"role_ceph_osd","operator":"Exists"},{"key":"role_va","operator":"Exists"},{"key":"role_backend","operator":"Exists"},{"key":"role_monitoring","operator":"Exists"},{"key":"role_balancer","operator":"Exists"},{"key":"role_nvidia","operator":"Exists"},{"key":"node.kubernetes.io/not-ready","operator":"Exists"},{"key":"node.cloudprovider.kubernetes.io/uninitialized","operator":"Exists"}]}}}}
+  creationTimestamp: "2022-01-28T10:29:32Z"
+  generation: 5
+  labels:
+    app: vminsert
+  name: vminsert
+  namespace: mon
+  resourceVersion: "1042071481"
+  uid: ddc6c396-b577-499f-ad97-e7717a646eb8
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: vminsert
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vminsert
+        component: vminsert
+        stack: monitoring
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/monitoring
+                operator: In
+                values:
+                - "true"
+            weight: 100
+          - preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                - "true"
+            weight: 10
+      containers:
+      - args:
+        - -envflag.enable
+        - -maxLabelsPerTimeseries=60
+        env:
+        - name: storageNode
+          value: vmstorage-0.vmstorage.mon.svc.cluster.local:8400,vmstorage-1.vmstorage.mon.svc.cluster.local:8400,vmstorage-2.vmstorage.mon.svc.cluster.local:8400
+        image: infra/victoria-vminsert:v1.77.2-cluster-2022-06-14-c9e18991
+        imagePullPolicy: IfNotPresent
+        name: vminsert
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 100m
+            memory: 256M
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: docker-registry-secret
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - key: role_maas
+        operator: Exists
+      - key: role_ceph
+        operator: Exists
+      - key: role_ceph_mon
+        operator: Exists
+      - key: role_ceph_osd
+        operator: Exists
+      - key: role_va
+        operator: Exists
+      - key: role_backend
+        operator: Exists
+      - key: role_monitoring
+        operator: Exists
+      - key: role_balancer
+        operator: Exists
+      - key: role_nvidia
+        operator: Exists
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+      - key: node.cloudprovider.kubernetes.io/uninitialized
+        operator: Exists
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2022-01-28T10:29:32Z"
+    lastUpdateTime: "2022-09-15T18:46:07Z"
+    message: ReplicaSet "vminsert-75685787c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2023-09-25T07:11:17Z"
+    lastUpdateTime: "2023-09-25T07:11:17Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 5
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

@@ -1,0 +1,35 @@
+remote_write:
+  - url: "http://vminsert.mon.svc.cluster.local:8480/insert/1/prometheus"
+    queue_config:
+      max_samples_per_send: 10000
+      capacity: 20000
+      max_shards: 30
+
+vmstorage ---
+####            - -envflag.enable
+          - -dedup.minScrapeInterval={{ _extra_args.dedup.minScrapeInterval }}
+          - -loggerLevel=WARN
+          - -search.maxQueueDuration=20s
+          - -search.maxConcurrentRequests=32
+          - -memory.allowedPercent=80
+####
+vmselect ---
+###               - -envflag.enable
+          - -cacheDataPath=/var/lib/vmselect/cache
+          - -loggerLevel=WARN
+          - -dedup.minScrapeInterval={{ _extra_args.dedup.minScrapeInterval }}
+          - -search.logSlowQueryDuration=25s
+          - -search.maxUniqueTimeseries=800000
+          - -search.maxQueryDuration=60s
+          - -search.maxConcurrentRequests=16
+          - -memory.allowedPercent=80
+####
+vmincert ---
+  ###          - -envflag.enable
+          - -maxLabelsPerTimeseries=80
+          - -loggerLevel=WARN
+          - -replicationFactor={{ global_monitoring_values.victoria.replicationFactor }}
+          - -maxConcurrentInserts=16
+          - -memory.allowedPercent=80
+###
+vmauth --- cm
