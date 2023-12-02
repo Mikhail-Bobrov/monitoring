@@ -1,11 +1,11 @@
-{{- if .Values.grafana.enable }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.grafana.name }}
+  name: grafana
   labels:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/instance: grafana
+    app: grafana
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
@@ -15,6 +15,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: grafana
       app.kubernetes.io/instance: grafana
+      app: grafana
   strategy:
     type: RollingUpdate
   template:
@@ -22,17 +23,18 @@ spec:
       labels:
         app.kubernetes.io/name: grafana
         app.kubernetes.io/instance: grafana
+        app: grafana
     spec:
       securityContext:
         fsGroup: 472
         runAsGroup: 472
         runAsUser: 472
       containers:
-        - name: {{ .Values.grafana.name }}
+        - name: grafana
           image: "grafana/grafana:8.3.4"
           imagePullPolicy: IfNotPresent
           ports:
-            - name: {{ .Values.grafana.name }}
+            - name: grafana
               containerPort: 3000
               protocol: TCP
           env:
@@ -59,8 +61,8 @@ spec:
               port: 3000
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 1
+              memory: 1528Mi
             requests:
               cpu: 100m
               memory: 128Mi
@@ -70,5 +72,4 @@ spec:
       volumes:
         - name: storage
           persistentVolumeClaim:
-            claimName: {{ .Values.grafana.pvc.name }}
-{{- end }}
+            claimName: grafana-pvc

@@ -28,7 +28,7 @@ spec:
       containers:
       - args:
         - --envflag.enable=true
-        - --storageNode=vmstorage-0.vmstorage.mon.svc.cluster.local:8401
+        - --storageNode=vmstorage.mon.svc.cluster.local:8401
         image: victoriametrics/vmselect:v1.77.2-cluster
         imagePullPolicy: IfNotPresent
         name: vmselect

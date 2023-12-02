@@ -1,19 +1,17 @@
-{{- if .Values.grafana.enable }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: {{ .Values.grafana.name }}
-  name: {{ .Values.grafana.name }}
+    app: grafana
+  name: grafana
 spec:
   ports:
-  - name: {{ .Values.grafana.name }}
+  - name: grafana
     port: 3000
     protocol: TCP
     targetPort: 3000
   selector:
-    app: {{ .Values.grafana.name }}
+    app: grafana
   type: ClusterIP
 status:
   loadBalancer: {}
-{{- end }}
