@@ -1,18 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "3"
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"vmauth"},"name":"vmauth","namespace":"mon"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"vmauth"}},"template":{"metadata":{"labels":{"app":"vmauth","component":"vmauth","stack":"monitoring"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"node-role.kubernetes.io/monitoring","operator":"In","values":["true"]}]},"weight":100},{"preference":{"matchExpressions":[{"key":"node-role.kubernetes.io/worker","operator":"In","values":["true"]}]},"weight":10}]}},"containers":[{"args":["-auth.config=/tmp/config.yaml"],"image":"infra/victoria-vmauth:v1.77.2-2022-06-14-f7951338","imagePullPolicy":"IfNotPresent","name":"vmauth","resources":{"limits":{"cpu":"0.5","memory":"512M"},"requests":{"cpu":"0.05","memory":"128M"}},"volumeMounts":[{"mountPath":"/tmp/","name":"vmauth-config"}]}],"imagePullSecrets":[{"name":"docker-registry-secret"}],"tolerations":[{"key":"role_maas","operator":"Exists"},{"key":"role_ceph","operator":"Exists"},{"key":"role_ceph_mon","operator":"Exists"},{"key":"role_ceph_osd","operator":"Exists"},{"key":"role_va","operator":"Exists"},{"key":"role_backend","operator":"Exists"},{"key":"role_monitoring","operator":"Exists"},{"key":"role_balancer","operator":"Exists"},{"key":"role_nvidia","operator":"Exists"},{"key":"node.kubernetes.io/not-ready","operator":"Exists"},{"key":"node.cloudprovider.kubernetes.io/uninitialized","operator":"Exists"}],"volumes":[{"configMap":{"name":"auth-config"},"name":"vmauth-config"}]}}}}
-  creationTimestamp: "2022-01-28T10:29:30Z"
-  generation: 5
   labels:
     app: vmauth
   name: vmauth
   namespace: mon
-  resourceVersion: "1054790096"
-  uid: 3f87524b-3070-429f-8be6-bf756199b76c
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -33,27 +25,10 @@ spec:
         component: vmauth
         stack: monitoring
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
-              matchExpressions:
-              - key: node-role.kubernetes.io/monitoring
-                operator: In
-                values:
-                - "true"
-            weight: 100
-          - preference:
-              matchExpressions:
-              - key: node-role.kubernetes.io/worker
-                operator: In
-                values:
-                - "true"
-            weight: 10
       containers:
       - args:
         - -auth.config=/tmp/config.yaml
-        image: infra/victoria-vmauth:v1.77.2-2022-06-14-f7951338
+        image: victoriametrics/vminsert:v1.77.2-cluster
         imagePullPolicy: IfNotPresent
         name: vmauth
         resources:
@@ -69,56 +44,12 @@ spec:
         - mountPath: /tmp/
           name: vmauth-config
       dnsPolicy: ClusterFirst
-      imagePullSecrets:
-      - name: docker-registry-secret
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      tolerations:
-      - key: role_maas
-        operator: Exists
-      - key: role_ceph
-        operator: Exists
-      - key: role_ceph_mon
-        operator: Exists
-      - key: role_ceph_osd
-        operator: Exists
-      - key: role_va
-        operator: Exists
-      - key: role_backend
-        operator: Exists
-      - key: role_monitoring
-        operator: Exists
-      - key: role_balancer
-        operator: Exists
-      - key: role_nvidia
-        operator: Exists
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-      - key: node.cloudprovider.kubernetes.io/uninitialized
-        operator: Exists
       volumes:
       - configMap:
           defaultMode: 420
           name: auth-config
         name: vmauth-config
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2022-01-28T10:29:30Z"
-    lastUpdateTime: "2022-09-15T18:46:04Z"
-    message: ReplicaSet "vmauth-5564cdc8dd" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  - lastTransitionTime: "2023-10-12T08:15:50Z"
-    lastUpdateTime: "2023-10-12T08:15:50Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 5
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1

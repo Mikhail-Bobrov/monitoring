@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: prometheus-core
-  name: prometheus-core
+    app: prometheus
+  name: prometheus
   namespace: mon
 spec:
   podManagementPolicy: OrderedReady
@@ -11,42 +11,15 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: prometheus-core
+      app: prometheus
   serviceName: prometheus
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: prometheus-core
+        app: prometheus
         component: prometheus
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
-              matchExpressions:
-              - key: node-role.kubernetes.io/monitoring
-                operator: In
-                values:
-                - "true"
-            weight: 100
-          - preference:
-              matchExpressions:
-              - key: node-role.kubernetes.io/worker
-                operator: In
-                values:
-                - "true"
-            weight: 10
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app: prometheus
-              namespaces:
-              - mon
-              topologyKey: kubernetes.io/hostname
-            weight: 1
       securityContext:
         runAsUser: 65534
         runAsGroup: 65534
@@ -58,7 +31,7 @@ spec:
         - --storage.tsdb.retention.time=2h
         - --config.file=/prometheus.yaml
         - --storage.tsdb.path=/var/lib/prom/
-        image: infra/monitoring-prom:v2.36.1-2022-06-27-dba1c76e
+        image: prom/prometheus:v2.48.0
         imagePullPolicy: IfNotPresent
         name: prometheus
         resources:
@@ -75,27 +48,7 @@ spec:
           name: configs-files
         - mountPath: /var/lib/prom/
           name: data-prometheus
-      - args:
-        - -volume-dir=/etc/prometheus/
-        - -webhook-url=http://127.0.0.1:8080/-/reload
-        image: infra/monitoring-prom-reloader:v0.7.1-2022-06-14-61b42da6
-        imagePullPolicy: IfNotPresent
-        name: prometheus-reloader
-        resources:
-          limits:
-            cpu: 100m
-            memory: 256Mi
-          requests:
-            cpu: 50m
-            memory: 128Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /etc/prometheus/
-          name: configs-files
       dnsPolicy: ClusterFirst
-      imagePullSecrets:
-      - name: docker-registry-secret
       restartPolicy: Always
       schedulerName: default-scheduler
       serviceAccount: prometheus
@@ -107,13 +60,7 @@ spec:
           defaultMode: 420
           sources:
           - configMap:
-              name: prometheus-core-config
-          - configMap:
-              name: prometheus-core-alerts-rules-config
-          - configMap:
-              name: prometheus-core-extra-rules-config
-          - configMap:
-              name: prometheus-core-extra-scrape-config
+              name: prometheus-config
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
@@ -122,7 +69,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: prometheus-core
+        app: prometheus
       name: data-prometheus
     spec:
       accessModes:
@@ -130,7 +77,7 @@ spec:
       resources:
         requests:
           storage: 25Gi
-      storageClassName: csi-rbd
+      storageClassName: standard
       volumeMode: Filesystem
     status:
       phase: Pending

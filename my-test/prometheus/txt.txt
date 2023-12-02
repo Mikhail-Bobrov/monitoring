@@ -4,7 +4,12 @@ remote_write:
       max_samples_per_send: 10000
       capacity: 20000
       max_shards: 30
-
+    alerting:
+      alertmanagers:
+      - scheme: http
+        static_configs:
+        - targets:
+          - "alertmanager.monitoring.svc:9093"
 vmstorage ---
 ####            - -envflag.enable
           - -dedup.minScrapeInterval={{ _extra_args.dedup.minScrapeInterval }}
@@ -33,3 +38,8 @@ vmincert ---
           - -memory.allowedPercent=80
 ###
 vmauth --- cm
+
+
+vmincert 
+ - name: storageNode
+   value: vmstorage-0.vmstorage.mon.svc.cluster.local:8400,vmstorage-1.vmstorage.mon.svc.cluster.local:8400,vmstorage-2.vmstorage.mon.svc.cluster.local:8400

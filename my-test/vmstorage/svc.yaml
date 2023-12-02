@@ -1,24 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"vmstorage"},"name":"vmstorage","namespace":"mon"},"spec":{"clusterIP":"None","ports":[{"name":"insert","port":8400,"protocol":"TCP","targetPort":8400},{"name":"select","port":8401,"protocol":"TCP","targetPort":8401},{"name":"metrics","port":8482,"protocol":"TCP","targetPort":8482}],"selector":{"app":"vmstorage"},"type":"ClusterIP"}}
-  creationTimestamp: "2022-01-28T10:28:12Z"
   labels:
     app: vmstorage
   name: vmstorage
   namespace: mon
-  resourceVersion: "384318800"
-  uid: 359aa9b6-b969-454b-87b2-6a512b8bdf39
 spec:
-  clusterIP: None
-  clusterIPs:
-  - None
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
   ports:
   - name: insert
     port: 8400
@@ -36,5 +23,3 @@ spec:
     app: vmstorage
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}

@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: blackbox-exporter-core
-  name: blackbox-exporter-core
+    app: blackbox-exporter
+  name: blackbox-exporter
   namespace: mon
 spec:
   progressDeadlineSeconds: 600
@@ -11,7 +11,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: blackbox-exporter-core
+      app: blackbox-exporter
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -21,7 +21,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: blackbox-exporter-core
+        app: blackbox-exporter
         component: blackbox
         stack: monitoring
     spec:
@@ -68,5 +68,5 @@ spec:
       volumes:
       - configMap:
           defaultMode: 420
-          name: blackbox-config-core
+          name: blackbox-config
         name: config
