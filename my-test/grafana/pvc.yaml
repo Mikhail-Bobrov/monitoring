@@ -3,6 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: grafana-pvc
+  namespace: mon
   finalizers:
     - kubernetes.io/pvc-protection
 spec:
