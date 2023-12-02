@@ -1,0 +1,79 @@
+      - job_name: kubernetes-cadvisor
+        honor_timestamps: true
+        scrape_interval: 1m
+        scrape_timeout: 10s
+        metrics_path: /metrics/cadvisor
+        scheme: https
+        authorization:
+          type: Bearer
+          credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: false
+        follow_redirects: true
+        enable_http2: true
+        relabel_configs:
+        - separator: ;
+          regex: __meta_kubernetes_node_label_(.+)
+          replacement: $1
+          action: labelmap
+        kubernetes_sd_configs:
+        - role: node
+          kubeconfig_file: ""
+          follow_redirects: true
+          enable_http2: true
+    - job_name: kubernetes-kubelet
+      honor_timestamps: true
+      scrape_interval: 1m
+      scrape_timeout: 10s
+      metrics_path: /metrics
+      scheme: http
+      follow_redirects: true
+      enable_http2: true
+      relabel_configs:
+      - source_labels: [node]
+        separator: ;
+        regex: (.*)
+        target_label: instance
+        replacement: $1
+        action: replace
+      - separator: ;
+        regex: __meta_kubernetes_node_label_(.+)
+        replacement: $1
+        action: labelmap
+      - source_labels: [__address__]
+        separator: ;
+        regex: ([^:]+):.*
+        target_label: __address__
+        replacement: $1:10255
+        action: replace
+      kubernetes_sd_configs:
+      - role: node
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+    - job_name: kubernetes-apiservers
+      honor_timestamps: true
+      scrape_interval: 1m
+      scrape_timeout: 10s
+      metrics_path: /metrics
+      scheme: https
+      authorization:
+        type: Bearer
+        credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: false
+      follow_redirects: true
+      enable_http2: true
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        separator: ;
+        regex: default;kubernetes;https
+        replacement: $1
+        action: keep
+      kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true

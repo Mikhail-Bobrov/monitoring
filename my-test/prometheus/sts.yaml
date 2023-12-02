@@ -48,6 +48,24 @@ spec:
           name: configs-files
         - mountPath: /var/lib/prom/
           name: data-prometheus
+      - args:
+        - -volume-dir=/etc/prometheus/
+        - -webhook-url=http://127.0.0.1:8080/-/reload
+        image: jimmidyson/configmap-reload:v0.9.0
+        imagePullPolicy: IfNotPresent
+        name: prometheus-reloader
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/prometheus/
+          name: configs-files
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

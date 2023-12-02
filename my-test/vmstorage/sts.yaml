@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - args:
-        - "--retentionPeriod=1"
+        - "--retentionPeriod=7"
         - "--storageDataPath=/vmstorage-data/"
         image: victoriametrics/vmstorage:v1.77.2-cluster
         imagePullPolicy: IfNotPresent

@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: blackbox-exporter
-  name: blackbox-exporter
+    app: pushgateway
+  name: pushgateway
   namespace: mon
 spec:
   progressDeadlineSeconds: 600
@@ -11,7 +11,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: blackbox-exporter
+      name: pushgateway
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -19,37 +19,31 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        prometheus.io.core/scrape: "true"
+        prometheus.io/port: "9091"
       creationTimestamp: null
       labels:
-        app: blackbox-exporter
-        component: blackbox
+        app: pushgateway
+        component: pushgateway
+        name: pushgateway
         stack: monitoring
     spec:
       containers:
-      - args:
-        - --config.file=/config/blackbox.yaml
-        image: prom/blackbox-exporter:v0.23.0
+      - image: prom/pushgateway:v1.6.1
         imagePullPolicy: IfNotPresent
-        name: blackbox-exporter
+        name: prometheus-pushgateway
         resources:
           limits:
-            cpu: 200m
-            memory: 200M
+            cpu: 300m
+            memory: 600M
           requests:
             cpu: 50m
-            memory: 50M
+            memory: 300M
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /config
-          name: config
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      volumes:
-      - configMap:
-          defaultMode: 420
-          name: blackbox-config
-        name: config
