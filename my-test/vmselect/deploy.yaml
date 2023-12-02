@@ -27,15 +27,9 @@ spec:
     spec:
       containers:
       - args:
-        - -envflag.enable
-        - -memory.allowedPercent=100
-        - -search.maxPointsPerTimeseries=45000
-        - -search.maxQueryDuration=60s
-        - -search.maxUniqueTimeseries=3000000
-        env:
-        - name: storageNode
-          value: vmstorage-0.vmstorage.mon.svc.cluster.local:8401,vmstorage-1.vmstorage.mon.svc.cluster.local:8401,vmstorage-2.vmstorage.mon.svc.cluster.local:8401
-        image: victoriametrics/vminsert:v1.77.2-cluster
+        - --envflag.enable=true
+        - --storageNode=vmstorage-0.vmstorage.mon.svc.cluster.local:8401
+        image: victoriametrics/vmselect:v1.77.2-cluster
         imagePullPolicy: IfNotPresent
         name: vmselect
         resources:

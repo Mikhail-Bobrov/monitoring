@@ -29,7 +29,7 @@ spec:
       - args:
         - --web.enable-lifecycle
         - --storage.tsdb.retention.time=2h
-        - --config.file=/prometheus.yaml
+        - --config.file=/etc/prometheus/prometheus.yml
         - --storage.tsdb.path=/var/lib/prom/
         image: prom/prometheus:v2.48.0
         imagePullPolicy: IfNotPresent

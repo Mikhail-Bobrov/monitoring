@@ -23,9 +23,9 @@ spec:
     spec:
       containers:
       - args:
-        - -envflag.enable
-        - -storageDataPath=/vmstorage-data/vmstorage
-        image: victoriametrics/vminsert:v1.77.2-cluster
+        - "--retentionPeriod=1"
+        - "--storageDataPath=/vmstorage-data/"
+        image: victoriametrics/vmstorage:v1.77.2-cluster
         imagePullPolicy: IfNotPresent
         name: vmstorage
         resources:

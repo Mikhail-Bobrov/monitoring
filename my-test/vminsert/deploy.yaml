@@ -27,12 +27,9 @@ spec:
     spec:
       containers:
       - args:
-        - -envflag.enable
-        - -maxLabelsPerTimeseries=60
+        - --envflag.enable=true
+        - --storageNode=vmstorage-0.vmstorage.mon.svc.cluster.local:8400
         image: victoriametrics/vminsert:v1.77.2-cluster
-        env:
-        - name: storageNode
-          value: vmstorage-0.vmstorage.mon.svc.cluster.local:8401,vmstorage-1.vmstorage.mon.svc.cluster.local:8401,vmstorage-2.vmstorage.mon.svc.cluster.local:8401
         imagePullPolicy: IfNotPresent
         name: vminsert
         resources:
