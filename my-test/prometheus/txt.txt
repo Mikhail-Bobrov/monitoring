@@ -43,3 +43,8 @@ vmauth --- cm
 vmincert 
  - name: storageNode
    value: vmstorage-0.vmstorage.mon.svc.cluster.local:8400,vmstorage-1.vmstorage.mon.svc.cluster.local:8400,vmstorage-2.vmstorage.mon.svc.cluster.local:8400
+
+grafana
+http://<victoriametrics-addr>:8428
+remote_write
+http://<victoriametrics-addr>:8428/api/v1/write
