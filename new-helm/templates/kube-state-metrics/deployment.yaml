@@ -1,0 +1,68 @@
+{{ if .Values.kubeMetrics.enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.kubeMetrics.name }}
+  name: {{ .Values.kubeMetrics.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.kubeMetrics.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.kubeMetrics.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.kubeMetrics.name }}
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - image: {{ .Values.kubeMetrics.image.repo -}}/{{- .Values.kubeMetrics.image.name -}}:{{- .Values.kubeMetrics.image.tag }}
+        {{- if .Values.kubeMetrics.probe.enable }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: {{ .Values.kubeMetrics.probe.initialDelaySeconds | default "5" }}
+          timeoutSeconds: {{ .Values.kubeMetrics.probe.timeoutSeconds | default "5" }}
+        {{- end }}
+        name: {{ .Values.kubeMetrics.name }}
+        {{- if .Values.kubeMetrics.resources }}
+        resources:
+        {{- with .Values.kubeMetrics.resources }}
+          limits:
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
+          requests:
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
+        ports:
+        - containerPort: 8080
+          name: http-metrics
+        - containerPort: 8081
+          name: telemetry
+        {{- if .Values.kubeMetrics.probe.enable }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: {{ .Values.kubeMetrics.probe.initialDelaySeconds | default "5" }}
+          timeoutSeconds: {{ .Values.kubeMetrics.probe.timeoutSeconds | default "5" }}
+        {{- end }}
+        {{- if .Values.kubeMetrics.security }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          seccompProfile:
+            type: RuntimeDefault
+        {{- end }}
+      serviceAccountName: {{ .Values.kubeMetrics.name -}}-sa
+{{ end }}

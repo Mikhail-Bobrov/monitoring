@@ -1,0 +1,20 @@
+{{ if .Values.nodeExporter.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ .Values.nodeExporter.name }}
+  name: {{ .Values.nodeExporter.name }}
+spec:
+  ports:
+  - name: {{ .Values.nodeExporter.name }}
+    port: 9100
+    protocol: TCP
+    targetPort: 9100
+  selector:
+    app: {{ .Values.nodeExporter.name }}
+  type: ClusterIP
+status:
+  loadBalancer: {}
+{{ end }}

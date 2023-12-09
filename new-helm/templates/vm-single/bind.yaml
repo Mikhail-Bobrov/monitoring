@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: victoria-single
+  name: victoria-single-bind
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: victoria-single
+subjects:
+- kind: ServiceAccount
+  name: victoria-single-sa
+  namespace: mon

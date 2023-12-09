@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: vmselect
+  name: vmselect
+  namespace: mon
+spec:
+  ports:
+  - name: select
+    port: 8481
+    protocol: TCP
+    targetPort: 8481
+  selector:
+    app: vmselect
+  sessionAffinity: None
+  type: ClusterIP

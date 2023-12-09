@@ -1,0 +1,20 @@
+{{ if .Values.kubeMetrics.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.kubeMetrics.name }}
+  name: {{ .Values.kubeMetrics.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  clusterIP: None
+  ports:
+  - name: http-metrics
+    port: 8080
+    targetPort: http-metrics
+  - name: telemetry
+    port: 8081
+    targetPort: telemetry
+  selector:
+    app: {{ .Values.kubeMetrics.name }}
+{{ end }}

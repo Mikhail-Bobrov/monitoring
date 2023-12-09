@@ -1,0 +1,157 @@
+# # Default values non system
+
+namespace: mon
+
+### Default values for blackbox
+
+blackbox:
+  enable: false
+  image:
+    tag: v0.23.0
+    repo: prom
+    name: blackbox-exporter
+  name: blackbox-exporter
+  args: {} 
+    ##- extra-args
+  strategy:
+    type: RollingUpdate   #Recreate
+    maxUnavailable: 0
+  resources:
+    limit:
+      cpu: 200m
+      memory: 200Mi
+    request:
+      cpu: 50m
+      memory: 50Mi
+
+
+### Default values  for kube-state-metrics
+
+kubeMetrics:
+  enable: false
+  name: kube-state-metrics
+  replicas: 1
+  image:
+    repo: registry.k8s.io
+    name: kube-state-metrics/kube-state-metrics
+    tag: v2.10.0
+  resources:
+    limit:
+      cpu: 200m
+      memory: 500Mi
+    request:
+      cpu: 100m
+      memory: 250Mi
+  security: true
+  probe: 
+    enable: true
+    #initialDelaySeconds 5
+    #timeoutSeconds 5
+
+
+
+### Default values for node-exporter
+
+nodeExporter:
+  enable: false
+  name: node-exporter
+  resources:
+    limit:
+      cpu: 250m
+      memory: 180Mi
+    request:
+      cpu: 100m
+      memory: 150Mi
+  args: {}
+  # - extra-args
+  image:
+    repo: quay.io
+    name: prometheus/node-exporter
+    tag: v1.7.0
+  strategy:
+    maxUnavailable: 1
+    type: Recreate  #RollingUpdate  Recreate
+
+
+
+#### Default values for pushgateway
+
+pushgateway:
+  enable: false
+  name: pushgateway
+  replicas: 1
+  image:
+    repo: prom
+    name: pushgateway
+    tag: v1.6.1
+  resources:
+    limit:
+      cpu: 250m
+      memory: 380Mi
+    request:
+      cpu: 100m
+      memory: 150Mi
+  strategy:
+    type: RollingUpdate   #Recreate
+    maxUnavailable: 0
+
+
+
+
+
+
+
+
+
+
+
+# Default values for prometheus.
+prometheus:
+  name: prometheus
+  image:
+    repo: prom
+    name: prometheus
+    tag: v2.40.2
+  configManName: prometheus-config
+  retentionPeriod: 2h
+  storageClass: lvm-ssd
+  storagePvc: 1Gi
+  resources:
+    limit_cpu: 400m
+    request_cpu: 100m
+    limit_memory: 800Mi
+    request_memory: 424Mi
+####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
+  config: empty
+  
+
+# Default values for alertmanager
+alertmanager:
+  enable: true
+  template: true
+  name: alertmanager
+  image:
+    repo: prom
+    name: alertmanager
+    tag: v0.24.0
+  resources:
+    limit_cpu: 500m
+    request_cpu: 200m
+    limit_memory: 512Mi
+    request_memory: 256Mi
+  storageClass: lvm-ssd
+  storagePvc: 1Gi
+
+# Default values for grafana
+
+grafana:
+  enable: true
+  name: grafana
+  secret:
+    user: admin
+    pass: admin
+  pvc:
+    name: grafana
+    storage: 1G
+    storageClass: standart
+  serviceLb: true

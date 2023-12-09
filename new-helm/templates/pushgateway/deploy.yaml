@@ -1,0 +1,58 @@
+{{ if .Values.pushgateway.enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.pushgateway.name }}
+  name: {{ .Values.pushgateway.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.pushgateway.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: {{ .Values.pushgateway.name }}
+  strategy:
+  {{- if eq .Values.pushgateway.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: {{ .Values.pushgateway.strategy.maxUnavailable }}
+    type: RollingUpdate
+  {{- end }}
+  {{- if eq .Values.pushgateway.strategy.type "Recreate" }}
+    type: Recreate
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io.core/scrape: "true"
+        prometheus.io/port: "9091"
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.pushgateway.name }}
+        stack: monitoring
+    spec:
+      containers:
+      - image: {{ .Values.pushgateway.image.repo -}}/{{- .Values.pushgateway.image.name -}}:{{-  .Values.pushgateway.image.tag }}
+        imagePullPolicy: IfNotPresent
+        name: {{ .Values.pushgateway.name }}
+        {{- if .Values.pushgateway.resources }}
+        resources:
+        {{- with .Values.pushgateway.resources }}
+          limits:
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
+          requests:
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+{{ end }}

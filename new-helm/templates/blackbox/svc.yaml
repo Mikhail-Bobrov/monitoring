@@ -1,0 +1,19 @@
+{{ if .Values.blackbox.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.blackbox.name }}
+  name: {{ .Values.blackbox.name -}}-svc
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - name: http
+    port: 9115
+    protocol: TCP
+    targetPort: 9115
+  selector:
+    app: {{ .Values.blackbox.name }}
+  sessionAffinity: None
+  type: ClusterIP
+{{ end }}

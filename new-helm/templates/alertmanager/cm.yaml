@@ -1,0 +1,54 @@
+apiVersion: v1
+data:
+  alertmanager.yaml: |
+  {{`
+    global:
+    templates:
+    - '/etc/alertmanager/custom.tmpl'
+    receivers:
+      - name: telegram_critical
+        telegram_configs:
+          - send_resolved: true
+            chat_id: -11
+            bot_token: 'token'
+            api_url: 'https://api.telegram.org'
+            parse_mode: HTML
+            message: '{{ template "telegram.custom.message" . }}'
+      - name: telegram_warning
+        telegram_configs:
+          - send_resolved: true
+            chat_id: -101
+            bot_token: 'token'
+            api_url: 'https://api.telegram.org'
+            parse_mode: HTML
+            message: '{{ template "telegram.custom.message" . }}'
+      - name: telegram_default
+        telegram_configs:
+          - send_resolved: true
+            chat_id: -1111
+            bot_token: 'token'
+            api_url: 'https://api.telegram.org'
+            parse_mode: HTML
+            message: '{{ template "telegram.custom.message" . }}'
+    route:
+      receiver: 'telegram_default'
+      group_wait: 30s
+      group_interval: 1m
+      repeat_interval: 10h
+      group_by: ['...']
+      routes:
+        - receiver: 'telegram_warning'
+          group_wait: 10s
+          matchers:
+          - severity = warning
+          - project = core
+        - receiver: 'telegram_critical'
+          group_wait: 10s
+          matchers:
+          - severity = critical
+          - project = core
+          `}}
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: mon

@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  config.yaml: |
+    users:
+     - username: "project"
+       password: "pass"
+       url_prefix: "http://vmselect.mon.svc.cluster.local:8481/select/4/prometheus"
+     - username: "project"
+       password: "pass"
+       url_prefix: "http://vmselect.mon.svc.cluster.local:8481/select/5/prometheus"
+kind: ConfigMap
+metadata:
+  name: auth-config
+  namespace: mon

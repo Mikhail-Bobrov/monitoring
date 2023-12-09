@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: mon
+  labels:
+    app: vmstorage-single
+  name: victoria-single-svc
+spec:
+  ports:
+    - name: http
+      port: 8428
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: vmstorage-single

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: vmstorage
+  name: vmstorage
+  namespace: mon
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: vmstorage
+  serviceName: vmstorage
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vmstorage
+        component: vmstorage
+        stack: monitoring
+    spec:
+      containers:
+      - args:
+        - "--retentionPeriod=7"
+        - "--storageDataPath=/vmstorage-data/"
+        image: victoriametrics/vmstorage:v1.77.2-cluster
+        imagePullPolicy: IfNotPresent
+        name: vmstorage
+        resources:
+          limits:
+            cpu: "3"
+            memory: 6G
+          requests:
+            cpu: 100m
+            memory: 1G
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /vmstorage-data/
+          name: data-victoria
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vmstorage
+      name: data-victoria
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: standard
+      volumeMode: Filesystem
+    status:
+      phase: Pending

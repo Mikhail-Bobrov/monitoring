@@ -1,0 +1,10 @@
+{{ if .Values.kubeMetrics.enable }}
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  labels:
+    app: {{ .Values.kubeMetrics.name }}
+  name: {{ .Values.kubeMetrics.name -}}-sa
+  namespace: {{ .Values.namespace }}
+{{ end }}

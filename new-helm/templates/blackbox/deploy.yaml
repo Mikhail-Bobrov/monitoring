@@ -1,0 +1,70 @@
+{{ if .Values.blackbox.enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.blackbox.name }}
+  name: {{ .Values.blackbox.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Values.blackbox.name }}
+  strategy:
+  {{- if eq .Values.blackbox.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: {{ .Values.blackbox.strategy.maxUnavailable }}
+    type: RollingUpdate
+  {{- end }}
+  {{- if eq .Values.blackbox.strategy.type "Recreate" }}
+    type: Recreate
+  {{- end }}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.blackbox.name }}
+        stack: monitoring
+    spec:
+      containers:
+      - args:
+        - --config.file=/config/blackbox.yaml
+        {{- if .Values.blackbox.args }}
+        {{- range .Values.blackbox.args }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        image: {{ .Values.blackbox.image.repo -}}/{{- .Values.blackbox.image.name -}}:{{- .Values.blackbox.image.tag }}
+        imagePullPolicy: IfNotPresent
+        name: {{ .Values.blackbox.name }}
+        {{- if .Values.blackbox.resources }}
+        resources:
+        {{- with .Values.blackbox.resources }}
+          limits:
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
+          requests:
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /config
+          name: config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.blackbox.name -}}-config
+        name: config
+{{ end }}

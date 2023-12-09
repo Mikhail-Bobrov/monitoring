@@ -1,0 +1,71 @@
+{{ if .Values.nodeExporter.enable }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: {{ .Values.nodeExporter.name }}
+  name: {{ .Values.nodeExporter.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.nodeExporter.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nodeExporter.name }}
+    spec:
+      containers:
+      - args:
+        - --path.sysfs=/host/sys
+        - --path.rootfs=/host
+        - --no-collector.wifi
+        - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+        {{- if .Values.nodeExporter.args }}
+        {{- range .Values.nodeExporter.args }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        name: {{ .Values.nodeExporter.name }}
+        image: {{ .Values.nodeExporter.image.repo -}}/{{- .Values.nodeExporter.image.name -}}:{{- .Values.nodeExporter.image.tag }}
+        ports:
+          - containerPort: 9100
+            protocol: TCP
+        {{- if .Values.nodeExporter.resources }}
+        resources:
+        {{- with .Values.nodeExporter.resources }}
+          limits:
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
+          requests:
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: /host/sys
+          mountPropagation: HostToContainer
+          name: sys
+          readOnly: true
+        - mountPath: /host
+          mountPropagation: HostToContainer
+          name: root
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /sys
+        name: sys
+      - hostPath:
+          path: /
+        name: root
+  updateStrategy:
+  {{- if eq .Values.nodeExporter.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: {{ .Values.nodeExporter.strategy.maxUnavailable }}
+    type: RollingUpdate
+  {{- end }}
+  {{- if eq .Values.nodeExporter.strategy.type "Recreate" }}
+    type: Recreate
+  {{- end }}
+{{ end }}
