@@ -51,6 +51,12 @@ spec:
           mountPropagation: HostToContainer
           name: root
           readOnly: true
+      {{- if .Values.kubeMetrics.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.kubeMetrics.imagePullSecrets }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
       volumes:
       - hostPath:
           path: /sys

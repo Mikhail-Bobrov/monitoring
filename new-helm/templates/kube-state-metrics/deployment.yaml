@@ -65,4 +65,10 @@ spec:
             type: RuntimeDefault
         {{- end }}
       serviceAccountName: {{ .Values.kubeMetrics.name -}}-sa
+      {{- if .Values.kubeMetrics.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.kubeMetrics.imagePullSecrets }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
 {{ end }}

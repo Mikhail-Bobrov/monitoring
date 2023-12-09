@@ -61,6 +61,12 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
+      {{- if .Values.blackbox.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.blackbox.imagePullSecrets }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
       terminationGracePeriodSeconds: 30
       volumes:
       - configMap:

@@ -5,12 +5,14 @@ namespace: mon
 ### Default values for blackbox
 
 blackbox:
-  enable: false
+  enable: true
   image:
     tag: v0.23.0
     repo: prom
     name: blackbox-exporter
   name: blackbox-exporter
+  imagePullSecrets: {}
+    ##- name-secret
   args: {} 
     ##- extra-args
   strategy:
@@ -30,6 +32,8 @@ blackbox:
 kubeMetrics:
   enable: false
   name: kube-state-metrics
+  imagePullSecrets: {}
+    ##- name-secret
   replicas: 1
   image:
     repo: registry.k8s.io
@@ -55,6 +59,8 @@ kubeMetrics:
 nodeExporter:
   enable: false
   name: node-exporter
+  imagePullSecrets: {}
+    ##- name-secret
   resources:
     limit:
       cpu: 250m
@@ -79,6 +85,8 @@ nodeExporter:
 pushgateway:
   enable: false
   name: pushgateway
+  imagePullSecrets: {}
+    ##- name-secret
   replicas: 1
   image:
     repo: prom

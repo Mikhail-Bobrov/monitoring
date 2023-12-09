@@ -51,6 +51,12 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
+      {{- if .Values.kubeMetrics.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.kubeMetrics.imagePullSecrets }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
