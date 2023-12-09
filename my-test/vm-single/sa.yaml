@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: victoria-single
+  name: victoria-single-sa
+  namespace: mon

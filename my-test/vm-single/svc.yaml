@@ -4,7 +4,7 @@ metadata:
   namespace: mon
   labels:
     app: vmstorage-single
-  name: victoria-metrics-single
+  name: victoria-single-svc
 spec:
   ports:
     - name: http
