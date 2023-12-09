@@ -5,7 +5,7 @@ namespace: mon
 ### Default values for blackbox
 
 blackbox:
-  enable: true
+  enable: false
   image:
     tag: v0.23.0
     repo: prom
@@ -104,6 +104,34 @@ pushgateway:
     maxUnavailable: 0
 
 
+
+
+### Default values for vm-single
+victoriaSingle:
+  enable: true
+  name: victoria-single
+  replicas: 1
+  image:
+    repo: victoriametrics
+    name: victoria-metrics
+    tag: v1.95.1
+  resources:
+    limit:
+      cpu: 250m
+      memory: 380Mi
+    request:
+      cpu: 100m
+      memory: 150Mi
+  storage:
+    class: standart
+    capacity: 10Gi
+  probe:
+    enable: true
+    #initialDelaySeconds: 30
+    #periodSeconds: 15
+    #successThreshold: 1
+    #timeoutSeconds: 5
+    #failureThreshold: 3
 
 
 

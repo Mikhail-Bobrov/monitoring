@@ -1,7 +1,8 @@
+{{ if .Values.victoriaSingle.enable }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: victoria-single
+  name: {{ .Values.victoriaSingle.name }}
 rules:
 - apiGroups:
   - ""
@@ -33,3 +34,4 @@ rules:
   - /healthz
   verbs:
   - get
+{{ end }}

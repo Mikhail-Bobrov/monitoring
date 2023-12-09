@@ -1,3 +1,4 @@
+{{ if .Values.victoriaSingle.enable }}
 apiVersion: v1
 data:
   scrape.yml: |2
@@ -73,6 +74,7 @@ data:
 kind: ConfigMap
 metadata:
   labels:
-    app: victoria-single
-  name: victoria-single-config
-  namespace: mon
+    app: {{ .Values.victoriaSingle.name }}
+  name: {{ .Values.victoriaSingle.name }}-config
+  namespace: {{ .Values.namespace }}
+{{ end }}

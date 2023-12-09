@@ -1,7 +1,9 @@
+{{ if .Values.victoriaSingle.enable }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app: victoria-single
-  name: victoria-single-sa
-  namespace: mon
+    app: {{ .Values.victoriaSingle.name }}
+  name: {{ .Values.victoriaSingle.name }}-sa
+  namespace: {{ .Values.namespace }}
+{{ end }}

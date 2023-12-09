@@ -1,10 +1,11 @@
+{{ if .Values.victoriaSingle.enable }}
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: mon
+  namespace: {{ .Values.namespace }}
   labels:
-    app: vmstorage-single
-  name: victoria-single-svc
+    app: {{ .Values.victoriaSingle.name }}
+  name: {{ .Values.victoriaSingle.name }}-svc
 spec:
   ports:
     - name: http
@@ -12,4 +13,5 @@ spec:
       protocol: TCP
       targetPort: http
   selector:
-    app: vmstorage-single
+    app: {{ .Values.victoriaSingle.name }}
+{{ end }}
