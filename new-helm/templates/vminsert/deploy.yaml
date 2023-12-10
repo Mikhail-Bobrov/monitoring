@@ -33,7 +33,7 @@ spec:
       containers:
       - args:
         - --envflag.enable=true
-        - --storageNode=vmstorage.{{- .Values.namespace -}}.svc.cluster.local:8400
+        - --storageNode={{- .Values.vmstorage.name -}}-svc.{{- .Values.namespace -}}.svc.cluster.local:8400
         {{- if .Values.vminsert.args }}
         {{- range .Values.vminsert.args }}
         - {{ . }}

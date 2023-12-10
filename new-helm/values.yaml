@@ -52,7 +52,7 @@ blackbox:
 ### Default values  for kube-state-metrics
 
 kubeMetrics:
-  enable: false
+  enable: true
   name: kube-state-metrics
   imagePullSecrets: {}
     ##- name-secret
@@ -79,7 +79,7 @@ kubeMetrics:
 ### Default values for node-exporter
 
 nodeExporter:
-  enable: false
+  enable: true
   name: node-exporter
   imagePullSecrets: {}
     ##- name-secret
@@ -98,7 +98,7 @@ nodeExporter:
     tag: v1.7.0
   strategy:
     maxUnavailable: 1
-    type: Recreate  #RollingUpdate  Recreate
+    type: OnDelete  #RollingUpdate  OnDelete
 
 
 
@@ -130,7 +130,7 @@ pushgateway:
 
 ### Default values for vm-single
 victoriaSingle:
-  enable: false
+  enable: true
   name: victoria-single
   replicas: 1
   image:
@@ -145,7 +145,7 @@ victoriaSingle:
       cpu: 100m
       memory: 150Mi
   storage:
-    class: standart
+    class: standard
     capacity: 10Gi
   probe:
     enable: true
@@ -168,6 +168,7 @@ victoriaSingle:
 prometheus:
   enable: false
   name: prometheus
+  replicas: 1
 
 
 
@@ -230,9 +231,9 @@ vmselect:
 
 #### Default values for vmstorage
 vmstorage:
-  enable: true
+  enable: false
   name: vmstorage
-  replicas: 1
+  replicas: 3
   resources:
     limit:
       cpu: 1
@@ -251,7 +252,7 @@ vmstorage:
     name: vmstorage
     tag: v1.77.2-cluster
   storage:
-    class: standart
+    class: standard
     capacity: 10Gi
 
 

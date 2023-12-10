@@ -15,6 +15,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.kubeMetrics.name }}
+        stack: monitoring
     spec:
       automountServiceAccountToken: true
       containers:

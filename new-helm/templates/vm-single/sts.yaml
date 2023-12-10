@@ -19,6 +19,7 @@ spec:
       creationTimestamp: null
       labels:
         app: {{ .Values.victoriaSingle.name }}
+        stack: monitoring
     spec:
       automountServiceAccountToken: true
       containers:

@@ -23,7 +23,6 @@ spec:
       creationTimestamp: null
       labels:
         app: vmauth
-        component: vmauth
         stack: monitoring
     spec:
       containers:

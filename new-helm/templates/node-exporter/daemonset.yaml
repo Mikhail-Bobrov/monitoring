@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.nodeExporter.name }}
+        stack: monitoring
     spec:
       containers:
       - args:
@@ -71,7 +72,7 @@ spec:
       maxUnavailable: {{ .Values.nodeExporter.strategy.maxUnavailable }}
     type: RollingUpdate
   {{- end }}
-  {{- if eq .Values.nodeExporter.strategy.type "Recreate" }}
-    type: Recreate
+  {{- if eq .Values.nodeExporter.strategy.type "OnDelete" }}
+    type: OnDelete
   {{- end }}
 {{ end }}

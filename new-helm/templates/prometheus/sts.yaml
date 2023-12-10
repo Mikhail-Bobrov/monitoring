@@ -3,23 +3,23 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: prometheus
-  name: prometheus
-  namespace: mon
+    app: {{ .Values.prometheus.name }}
+  name: {{ .Values.prometheus.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   podManagementPolicy: OrderedReady
-  replicas: 1
+  replicas: {{ .Values.prometheus.replicas }}
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: prometheus
-  serviceName: prometheus
+      app: {{ .Values.prometheus.name }}
+  serviceName: {{ .Values.prometheus.name }}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: prometheus
-        component: prometheus
+        app: {{ .Values.prometheus.name }}
+        stack: monitoring
     spec:
       securityContext:
         runAsUser: 65534
@@ -34,14 +34,14 @@ spec:
         - --storage.tsdb.path=/var/lib/prom/
         image: prom/prometheus:v2.48.0
         imagePullPolicy: IfNotPresent
-        name: prometheus
+        name: {{ .Values.prometheus.name }}
         resources:
           limits:
-            cpu: "3"
-            memory: 12G
+            cpu: "1"
+            memory: 1G
           requests:
             cpu: 200m
-            memory: 1G
+            memory: 500Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -54,7 +54,7 @@ spec:
         - -webhook-url=http://127.0.0.1:8080/-/reload
         image: jimmidyson/configmap-reload:v0.9.0
         imagePullPolicy: IfNotPresent
-        name: prometheus-reloader
+        name: {{ .Values.prometheus.name -}}-reloader
         resources:
           limits:
             cpu: 100m
@@ -70,8 +70,8 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccount: prometheus
-      serviceAccountName: prometheus
+      serviceAccount: {{ .Values.prometheus.name -}}-sa
+      serviceAccountName: {{ .Values.prometheus.name -}}-sa
       terminationGracePeriodSeconds: 30
       volumes:
       - name: configs-files
