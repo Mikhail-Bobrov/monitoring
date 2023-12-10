@@ -1,16 +1,18 @@
+{{- if .Values.prometheus.enable }}
 apiVersion: v1
 kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: prometheus
-  name: prometheus-svc
+    app: {{ .Values.prometheus.name }}
+  name: {{ .Values.prometheus.name -}}-svc
 spec:
   ports:
-  - name: prometheus
+  - name: {{ .Values.prometheus.name }}
     port: 9090
     protocol: TCP
     targetPort: 9090
   selector:
-    app: prometheus
+    app: {{ .Values.prometheus.name }}
   type: ClusterIP
+{{- end }}

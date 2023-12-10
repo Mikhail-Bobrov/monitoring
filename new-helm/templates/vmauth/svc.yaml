@@ -1,17 +1,19 @@
+{{- if .Values.vmauth.enable }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: vmauth
-  name: vmauth
-  namespace: mon
+    app: {{ .Values.vmauth.name }}
+  name: {{ .Values.vmauth.name -}}-svc
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - name: auth
+  - name: {{ .Values.vmauth.name }}
     port: 8427
     protocol: TCP
     targetPort: 8427
   selector:
-    app: vmauth
+    app: {{ .Values.vmauth.name }}
   sessionAffinity: None
   type: ClusterIP
+{{- end }}

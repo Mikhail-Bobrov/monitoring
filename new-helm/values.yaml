@@ -1,4 +1,4 @@
-# # Default values non system
+# # Default non system values
 
 namespace: mon
 
@@ -12,9 +12,10 @@ config:
       enable: false
       urls: {}
         #- https://google.com
+        #- https://my-url
   
 
-###    kubernetesPods annotations ---> just add this annotation
+###    kubernetesPods annotations ---> just add this annotation into pods
 ####   annotations:
 #        prometheus.io/scrape: "true"
 #        prometheus.io/metric_path: /actuator/prometheus
@@ -129,7 +130,7 @@ pushgateway:
 
 ### Default values for vm-single
 victoriaSingle:
-  enable: true
+  enable: false
   name: victoria-single
   replicas: 1
   image:
@@ -162,59 +163,157 @@ victoriaSingle:
 
 
 
+### Default values for prometheus
+
+prometheus:
+  enable: false
+  name: prometheus
 
 
 
 
+
+
+
+#### Default values for vmauth
+vmauth:
+  enable: false
+  name: vmauth
+
+
+#### Default values for vminsert
+vminsert:
+  enable: false
+  name: vminsert
+  replicas: 1
+  image:
+    repo: victoriametrics
+    name: vminsert
+    tag: v1.77.2-cluster
+  strategy:
+    type: RollingUpdate   #Recreate
+    maxUnavailable: 0
+  resources:
+    limit:
+      cpu: 500m
+      memory: 750Mi
+    request:
+      cpu: 100m
+      memory: 250Mi
+  args: {}
+    ##- -extra-args
+    ### storage !!!!
+
+
+#### Default values for vmselect
+vmselect:
+  enable: false
+  name: vmselect
+  replicas: 1
+  strategy:
+    type: RollingUpdate   #Recreate
+    maxUnavailable: 0
+  resources:
+    limit:
+      cpu: 500m
+      memory: 750Mi
+    request:
+      cpu: 100m
+      memory: 250Mi
+  args: {}
+    #- -extra-args
+  image:
+    repo: victoriametrics
+    name: vmselect
+    tag: v1.77.2-cluster
+#### storage!!!
+
+#### Default values for vmstorage
+vmstorage:
+  enable: true
+  name: vmstorage
+  replicas: 1
+  resources:
+    limit:
+      cpu: 1
+      memory: 1250Mi
+    request:
+      cpu: 300m
+      memory: 550Mi
+  args:
+    retentionPeriod: 7
+    storagePath: "/var/lib/vmstorage/data"
+  extArgs:
+    - -loggerLevel=WARN
+    - -memory.allowedPercent=80
+  image:
+    repo: victoriametrics
+    name: vmstorage
+    tag: v1.77.2-cluster
+  storage:
+    class: standart
+    capacity: 10Gi
+
+
+#### Default values for grafana
+grafana:
+  enable: false
+  name: grafana
+
+#### Default values for alertmanager
+
+alertmanager:
+  enable: false
+  name: alertmanager
 
 
 # Default values for prometheus.
-prometheus:
-  name: prometheus
-  image:
-    repo: prom
-    name: prometheus
-    tag: v2.40.2
-  configManName: prometheus-config
-  retentionPeriod: 2h
-  storageClass: lvm-ssd
-  storagePvc: 1Gi
-  resources:
-    limit_cpu: 400m
-    request_cpu: 100m
-    limit_memory: 800Mi
-    request_memory: 424Mi
-####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
-  config: empty
+# prometheus:
+#   name: prometheus
+#   image:
+#     repo: prom
+#     name: prometheus
+#     tag: v2.40.2
+#   configManName: prometheus-config
+#   retentionPeriod: 2h
+#   storageClass: lvm-ssd
+#   storagePvc: 1Gi
+#   resources:
+#     limit_cpu: 400m
+#     request_cpu: 100m
+#     limit_memory: 800Mi
+#     request_memory: 424Mi
+# ####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
+#   config: empty
   
 
 # Default values for alertmanager
-alertmanager:
-  enable: true
-  template: true
-  name: alertmanager
-  image:
-    repo: prom
-    name: alertmanager
-    tag: v0.24.0
-  resources:
-    limit_cpu: 500m
-    request_cpu: 200m
-    limit_memory: 512Mi
-    request_memory: 256Mi
-  storageClass: lvm-ssd
-  storagePvc: 1Gi
+# alertmanager:
+#   enable: true
+#   template: true
+#   name: alertmanager
+#   image:
+#     repo: prom
+#     name: alertmanager
+#     tag: v0.24.0
+#   resources:
+#     limit_cpu: 500m
+#     request_cpu: 200m
+#     limit_memory: 512Mi
+#     request_memory: 256Mi
+#   storageClass: lvm-ssd
+#   storagePvc: 1Gi
 
 # Default values for grafana
 
-grafana:
-  enable: true
-  name: grafana
-  secret:
-    user: admin
-    pass: admin
-  pvc:
-    name: grafana
-    storage: 1G
-    storageClass: standart
-  serviceLb: true
+# grafana:
+#   enable: true
+#   name: grafana
+#   secret:
+#     user: admin
+#     pass: admin
+#   pvc:
+#     name: grafana
+#     storage: 1G
+#     storageClass: standart
+#   serviceLb: true

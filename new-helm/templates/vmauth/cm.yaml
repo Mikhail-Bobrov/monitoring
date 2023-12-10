@@ -1,3 +1,4 @@
+{{- if .Values.vmauth.enable }}
 apiVersion: v1
 data:
   config.yaml: |
@@ -10,5 +11,6 @@ data:
        url_prefix: "http://vmselect.mon.svc.cluster.local:8481/select/5/prometheus"
 kind: ConfigMap
 metadata:
-  name: auth-config
-  namespace: mon
+  name: {{ .Values.vmauth.name -}}-config
+  namespace: {{ .Values.namespace }}
+{{- end }}

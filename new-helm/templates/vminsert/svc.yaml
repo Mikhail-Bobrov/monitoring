@@ -1,17 +1,19 @@
+{{- if .Values.vminsert.enable }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: vminsert
-  name: vminsert
-  namespace: mon
+    app: {{ .Values.vminsert.name }}
+  name: {{ .Values.vminsert.name -}}-svc
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - name: insert
+  - name: {{ .Values.vminsert.name }}
     port: 8480
     protocol: TCP
     targetPort: 8480
   selector:
-    app: vminsert
+    app: {{ .Values.vminsert.name }}
   sessionAffinity: None
   type: ClusterIP
+{{- end }}

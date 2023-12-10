@@ -1,3 +1,4 @@
+{{- if .Values.prometheus.enable }}
 apiVersion: v1
 data:
   prometheus.yml: |-
@@ -20,6 +21,7 @@ data:
 kind: ConfigMap
 metadata:
   labels:
-    name: prometheus-config
-  name: prometheus-config
-  namespace: mon
+    name: {{ .Values.prometheus.name }}
+  name: {{ .Values.prometheus.name -}}-config
+  namespace: {{ .Values.namespace }}
+{{- end }}

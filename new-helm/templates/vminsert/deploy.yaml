@@ -1,44 +1,58 @@
+{{- if .Values.vminsert.enable }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: vminsert
-  name: vminsert
-  namespace: mon
+    app: {{ .Values.vminsert.name }}
+  name: {{ .Values.vminsert.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   progressDeadlineSeconds: 600
-  replicas: 1
+  replicas: {{ .Values.vminsert.replicas }}
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: vminsert
+      app: {{ .Values.vminsert.name }}
   strategy:
+  {{- if eq .Values.vminsert.strategy.type "RollingUpdate" }}
     rollingUpdate:
       maxSurge: 25%
-      maxUnavailable: 25%
+      maxUnavailable: {{ .Values.vminsert.strategy.maxUnavailable }}
     type: RollingUpdate
+  {{- end }}
+  {{- if eq .Values.vminsert.strategy.type "Recreate" }}
+    type: Recreate
+  {{- end }}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: vminsert
-        component: vminsert
+        app: {{ .Values.vminsert.name }}
         stack: monitoring
     spec:
       containers:
       - args:
         - --envflag.enable=true
-        - --storageNode=vmstorage.mon.svc.cluster.local:8400
-        image: victoriametrics/vminsert:v1.77.2-cluster
+        - --storageNode=vmstorage.{{- .Values.namespace -}}.svc.cluster.local:8400
+        {{- if .Values.vminsert.args }}
+        {{- range .Values.vminsert.args }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        image: {{ .Values.vminsert.image.repo -}}/{{- .Values.vminsert.image.name -}}:{{- .Values.vminsert.image.tag }}
         imagePullPolicy: IfNotPresent
-        name: vminsert
+        name: {{ .Values.vminsert.name }}
+        {{- if .Values.vminsert.resources }}
         resources:
+        {{- with .Values.vminsert.resources }}
           limits:
-            cpu: "2"
-            memory: 2G
+            cpu: {{ .limit.cpu  | default "500m" }}
+            memory: {{ .limit.memory | default "1024Mi" }}
           requests:
-            cpu: 100m
-            memory: 256M
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
@@ -46,3 +60,4 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+{{- end }}

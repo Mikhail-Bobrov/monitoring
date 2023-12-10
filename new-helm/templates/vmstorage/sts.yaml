@@ -1,44 +1,53 @@
+{{- if .Values.vmstorage.enable }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: vmstorage
-  name: vmstorage
-  namespace: mon
+    app: {{ .Values.vmstorage.name }}
+  name: {{ .Values.vmstorage.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   podManagementPolicy: OrderedReady
-  replicas: 1
+  replicas: {{ .Values.vmstorage.replicas }}
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: vmstorage
-  serviceName: vmstorage
+      app: {{ .Values.vmstorage.name }}
+  serviceName: {{ .Values.vmstorage.name -}}-svc
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: vmstorage
-        component: vmstorage
+        app: {{ .Values.vmstorage.name }}
         stack: monitoring
     spec:
       containers:
       - args:
-        - "--retentionPeriod=7"
-        - "--storageDataPath=/vmstorage-data/"
-        image: victoriametrics/vmstorage:v1.77.2-cluster
+        - --retentionPeriod={{- .Values.vmstorage.args.retentionPeriod | default "1" }}
+        - --storageDataPath={{- .Values.vmstorage.args.storagePath | default "/var/lib/data" }}
+        {{- if .Values.vmstorage.extArgs }}
+        {{- range .Values.vmstorage.extArgs }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        image: {{ .Values.vmstorage.image.repo -}}/{{- .Values.vmstorage.image.name -}}:{{- .Values.vmstorage.image.tag }}
         imagePullPolicy: IfNotPresent
-        name: vmstorage
+        name: {{ .Values.vmstorage.name }}
+        {{- if .Values.vmstorage.resources }}
         resources:
+        {{- with .Values.vmstorage.resources }}
           limits:
-            cpu: "3"
-            memory: 6G
+            cpu: {{ .limit.cpu  | default "500m" }}
+            memory: {{ .limit.memory | default "1024Mi" }}
           requests:
-            cpu: 100m
-            memory: 1G
+            cpu: {{ .request.cpu | default "150m" }}
+            memory: {{ .request.memory | default "300Mi" }}
+        {{- end }}
+        {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /vmstorage-data/
+        - mountPath: {{ .Values.vmstorage.args.storagePath | default "/var/lib/data" }}
           name: data-victoria
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -62,8 +71,9 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 10Gi
-      storageClassName: standard
+          storage: {{ .Values.vmstorage.storage.capacity | default "1Gi" }}
+      storageClassName: {{ .Values.vmstorage.storage.class }}
       volumeMode: Filesystem
     status:
       phase: Pending
+{{- end }}

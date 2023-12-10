@@ -1,3 +1,4 @@
+{{- if .Values.alertmanager.enable }}
 apiVersion: v1
 data:
   custom.tmpl: |
@@ -43,3 +44,4 @@ metadata:
   creationTimestamp: null
   name: alertmanager-template
   namespace: mon
+{{- end }}

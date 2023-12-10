@@ -1,3 +1,4 @@
+{{- if .Values.alertmanager.enable }}
 apiVersion: v1
 data:
   alertmanager.yaml: |
@@ -52,3 +53,4 @@ kind: ConfigMap
 metadata:
   name: alertmanager-config
   namespace: mon
+{{- end }}

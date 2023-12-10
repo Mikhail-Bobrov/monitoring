@@ -1,25 +1,27 @@
+{{- if .Values.vmstorage.enable }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: vmstorage
-  name: vmstorage
-  namespace: mon
+    app: {{ .Values.vmstorage.name }}
+  name: {{ .Values.vmstorage.name -}}-svc
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - name: insert
+  - name: {{ .Values.vminsert.name }}
     port: 8400
     protocol: TCP
     targetPort: 8400
-  - name: select
+  - name: {{ .Values.vmselect.name }}
     port: 8401
     protocol: TCP
     targetPort: 8401
-  - name: metrics
+  - name: {{ .Values.vmstorage.name }}
     port: 8482
     protocol: TCP
     targetPort: 8482
   selector:
-    app: vmstorage
+    app: {{ .Values.vmstorage.name }}
   sessionAffinity: None
   type: ClusterIP
+{{- end }}

@@ -4,8 +4,9 @@ data:
   scrape.yml: |2
 
     global:
-      scrape_interval: 15s
+      scrape_interval: 1m
     scrape_configs:
+    {{- .Files.Get "customs/scrapeconfig.yaml" | nindent 4 }}
     - job_name: victoriametrics
       static_configs:
       - targets:

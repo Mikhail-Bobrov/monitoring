@@ -1,17 +1,19 @@
+{{- if .Values.vmselect.enable }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: vmselect
-  name: vmselect
-  namespace: mon
+    app: {{ .Values.vmselect.name }}
+  name: {{ .Values.vmselect.name -}}-svc
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - name: select
+  - name: {{ .Values.vmselect.name }}
     port: 8481
     protocol: TCP
     targetPort: 8481
   selector:
-    app: vmselect
+    app: {{ .Values.vmselect.name }}
   sessionAffinity: None
   type: ClusterIP
+{{- end }}

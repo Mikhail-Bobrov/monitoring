@@ -1,4 +1,4 @@
-
+{{- if .Values.grafana.enable }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -13,3 +13,4 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: standard
+{{- end }}

@@ -1,6 +1,8 @@
+{{- if .Values.prometheus.enable }}
 apiVersion: v1
 kind: ServiceAccount
 automountServiceAccountToken: false
 metadata:
-  name: prometheus
-  namespace: mon
+  name: {{ .Values.prometheus.name -}}-sa
+  namespace: {{ .Values.namespace }}
+{{- end }}
