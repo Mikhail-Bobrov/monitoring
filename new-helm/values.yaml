@@ -2,6 +2,27 @@
 
 namespace: mon
 
+config:
+  scrape:
+    kubernetesCadvisor: true
+    kubernetesKubelet: true
+    kubernetesPods: true
+    database: false
+    blackboxUrl:
+      enable: false
+      urls: {}
+        #- https://google.com
+  
+
+###    kubernetesPods annotations ---> just add this annotation
+####   annotations:
+#        prometheus.io/scrape: "true"
+#        prometheus.io/metric_path: /actuator/prometheus
+#        prometheus.io/port: "8080"
+####
+####  database ----> just add label  database_metrics_enabled: true
+
+
 ### Default values for blackbox
 
 blackbox:
@@ -132,6 +153,12 @@ victoriaSingle:
     #successThreshold: 1
     #timeoutSeconds: 5
     #failureThreshold: 3
+  args:
+    retentionPeriod: 7
+    storagePath: "/var/lib/victoria-single/data"
+  extArgs:
+    - -loggerLevel=WARN
+    - -promscrape.config.strictParse=false
 
 
 

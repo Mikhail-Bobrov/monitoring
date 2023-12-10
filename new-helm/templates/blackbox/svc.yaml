@@ -1,4 +1,4 @@
-{{ if .Values.blackbox.enable }}
+{{ if or .Values.blackbox.enable .Values.config.scrape.blackboxUrl.enable }}
 apiVersion: v1
 kind: Service
 metadata:
