@@ -1,36 +1,32 @@
 {{- if .Values.alertmanager.enable }}
 apiVersion: v1
 data:
-  alertmanager.yaml: |
-  {{`
+  alertmanager.yaml: |2
+
     global:
     templates:
-    - '/etc/alertmanager/custom.tmpl'
+    - '/etc/alertmanager/telegram.tmpl'
     receivers:
-      - name: telegram_critical
-        telegram_configs:
-          - send_resolved: true
-            chat_id: -11
-            bot_token: 'token'
-            api_url: 'https://api.telegram.org'
-            parse_mode: HTML
-            message: '{{ template "telegram.custom.message" . }}'
-      - name: telegram_warning
-        telegram_configs:
-          - send_resolved: true
-            chat_id: -101
-            bot_token: 'token'
-            api_url: 'https://api.telegram.org'
-            parse_mode: HTML
-            message: '{{ template "telegram.custom.message" . }}'
+      {{- if eq .Values.config.alertmanager.config.type "telegram" }}
       - name: telegram_default
         telegram_configs:
-          - send_resolved: true
-            chat_id: -1111
-            bot_token: 'token'
+          - send_resolved: true ##hardcode
+            chat_id: -1111 ##hardcode
+            bot_token: 'token' ##hardcode
             api_url: 'https://api.telegram.org'
             parse_mode: HTML
-            message: '{{ template "telegram.custom.message" . }}'
+            message: '{{ "{{"  }} template "telegram.custom.message" . }}'
+      {{- range .Values.config.alertmanager.config.bot }}
+      - name: {{ .name  }}
+        telegram_configs:
+          - send_resolved: {{ .send_resolved | default "true" }}
+            chat_id: {{ .chat_id }}
+            bot_token: {{ .bot_token | quote }}
+            api_url: 'https://api.telegram.org'
+            parse_mode: HTML
+            message: '{{ "{{"  }} template "telegram.custom.message" . }}' 
+      {{- end }}
+      {{- end }}
     route:
       receiver: 'telegram_default'
       group_wait: 30s
@@ -38,17 +34,18 @@ data:
       repeat_interval: 10h
       group_by: ['...']
       routes:
-        - receiver: 'telegram_warning'
+        {{- if eq .Values.config.alertmanager.config.type "telegram" }}
+        {{- range .Values.config.alertmanager.config.bot }}
+        - receiver: {{ .name }}
           group_wait: 10s
           matchers:
-          - severity = warning
-          - project = core
-        - receiver: 'telegram_critical'
-          group_wait: 10s
-          matchers:
-          - severity = critical
-          - project = core
-          `}}
+          {{- range $key, $val := .routeLabel }}
+          {{- range $key2, $val2 := $val }}
+          - {{ $key2 }} = {{ $val2 }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
 kind: ConfigMap
 metadata:
   name: {{ .Values.alertmanager.name -}}-config

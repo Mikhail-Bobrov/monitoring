@@ -56,12 +56,16 @@ spec:
         - mountPath: /etc/alertmanager/
           name: configs-files
         - mountPath: {{ .Values.alertmanager.args.storagePath | default "/var/lib/data" }}
-          name: data-alertmanager
+          name: data-{{- .Values.alertmanager.name }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
       volumes:
+      {{- if eq .Values.config.cluster.type "single" }}
+      - name: data-{{- .Values.alertmanager.name }}
+        emptyDir: {}
+      {{- end }}
       - name: configs-files
         projected:
           defaultMode: 420
@@ -74,6 +78,7 @@ spec:
     rollingUpdate:
       partition: 0
     type: RollingUpdate
+  {{- if eq .Values.config.cluster.type "ha" }}
   volumeClaimTemplates:
   - apiVersion: v1
     kind: PersistentVolumeClaim
@@ -92,4 +97,5 @@ spec:
       volumeMode: Filesystem
     status:
       phase: Pending
+  {{- end }}
 {{- end }}

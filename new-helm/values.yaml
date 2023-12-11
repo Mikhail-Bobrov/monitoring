@@ -3,6 +3,26 @@
 namespace: mon
 
 config:
+  cluster:
+    type: single  ### single ### medium
+  alertmanager:
+    config:
+      type: telegram #slack e g
+      bot:
+      - name: telegram_critical
+        bot_token: dawdawdawdawd
+        chat_id: '-4234123123123'
+        routeLabel:
+        - severity: critical
+      # - name: telegram_warning
+      #   bot_token: dawdawdawdawd
+      #   send_resolved: "false"
+      #   chat_id: '-123123123123'
+      #   routeLabel:
+      #   - severity: warning
+    template:
+      custom: false    ## if it true - also going to get customs/alertmanagerTemplate.yaml 
+      ## template setting
   scrape:
     kubernetesCadvisor: true
     kubernetesKubelet: true
@@ -232,7 +252,6 @@ vminsert:
       memory: 250Mi
   args: {}
     ##- -extra-args
-    ### storage !!!!
 
 
 #### Default values for vmselect
@@ -256,7 +275,6 @@ vmselect:
     repo: victoriametrics
     name: vmselect
     tag: v1.77.2-cluster
-#### storage!!!
 
 #### Default values for vmstorage
 vmstorage:
@@ -315,24 +333,6 @@ alertmanager:
   storage:
     class: standard
     capacity: 1Gi
-
-
-# Default values for alertmanager
-# alertmanager:
-#   enable: true
-#   template: true
-#   name: alertmanager
-#   image:
-#     repo: prom
-#     name: alertmanager
-#     tag: v0.24.0
-#   resources:
-#     limit_cpu: 500m
-#     request_cpu: 200m
-#     limit_memory: 512Mi
-#     request_memory: 256Mi
-#   storageClass: lvm-ssd
-#   storagePvc: 1Gi
 
 # Default values for grafana
 

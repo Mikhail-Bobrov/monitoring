@@ -5,6 +5,14 @@ data:
 
     global:
       scrape_interval: 1m
+    {{- if .Values.alertmanager.enable }}
+    alerting:
+      alertmanagers:
+      - scheme: http
+        static_configs:
+        - targets:
+          - "{{- .Values.alertmanager.name -}}-svc.{{- .Values.namespace -}}.svc.cluster.local:9093"
+    {{- end }}
     scrape_configs:
     {{- .Files.Get "customs/scrapeconfig.yaml" | nindent 4 }}
     - job_name: victoriametrics

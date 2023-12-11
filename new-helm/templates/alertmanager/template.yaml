@@ -1,7 +1,7 @@
 {{- if .Values.alertmanager.enable }}
 apiVersion: v1
 data:
-  custom.tmpl: |
+  telegram.tmpl: |
         {{`
         {{ define "telegram.custom.message" }}
         {{ if gt (len .Alerts.Firing) 0 }}
@@ -39,6 +39,11 @@ data:
         {{- end }}
         {{- end }}
         {{- end }} `}}
+  {{- if .Values.config.alertmanager.template.custom }}
+  custom.tmpl: |2
+
+  {{ .Files.Get "customs/alertmanagerTemplate.yaml" | nindent 8 }}
+  {{- end }}
 kind: ConfigMap
 metadata:
   creationTimestamp: null
