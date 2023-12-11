@@ -1,23 +1,186 @@
 {{- if .Values.prometheus.enable }}
 apiVersion: v1
 data:
-  prometheus.yml: |-
+  prometheus.yml: |2
+
     global:
-      scrape_interval: 30s
-      evaluation_interval: 30s
+      scrape_interval: 1m
     remote_write:
-      - url: "http://vminsert.mon.svc.cluster.local:8480/insert/1/prometheus"
+      - url: "http://{{- .Values.vminsert.name -}}-svc.{{- .Values.namespace -}}.svc.cluster.local:8480/insert/1/prometheus"
         queue_config:
           max_samples_per_send: 10000
           capacity: 20000
           max_shards: 30
     scrape_configs:
-      - job_name: 'node-exporter'
-        static_configs:
-          - targets: ['node-exporter.mon.svc.cluster.local:9100']
-      - job_name: 'kube-state-metrics'
-        static_configs:
-          - targets: ['kube-state-metrics.mon.svc.cluster.local:8080']
+    {{- .Files.Get "customs/scrapeconfig.yaml" | nindent 4 }}
+    - job_name: prometheus
+      static_configs:
+      - targets:
+        - localhost:9090
+    {{- if .Values.nodeExporter.enable }}
+    - job_name: 'node-exporter'
+      static_configs:
+      - targets: ['{{- .Values.nodeExporter.name -}}.{{- .Values.namespace -}}.svc.cluster.local:9100']
+    {{- end }}
+    {{- if .Values.kubeMetrics.enable }}
+    - job_name: 'kube-state-metrics'
+      static_configs:
+      - targets: ['{{- .Values.kubeMetrics.name -}}.{{- .Values.namespace -}}.svc.cluster.local:8080']
+    {{- end }}
+    {{- if .Values.config.scrape.kubernetesKubelet }}
+    - job_name: kubernetes-kubelet
+      honor_timestamps: true
+      scrape_interval: 1m
+      scrape_timeout: 10s
+      metrics_path: /metrics
+      scheme: http
+      follow_redirects: true
+      enable_http2: true
+      relabel_configs:
+      - source_labels: [node]
+        separator: ;
+        regex: (.*)
+        target_label: instance
+        replacement: $1
+        action: replace
+      - separator: ;
+        regex: __meta_kubernetes_node_label_(.+)
+        replacement: $1
+        action: labelmap
+      - source_labels: [__address__]
+        separator: ;
+        regex: ([^:]+):.*
+        target_label: __address__
+        replacement: $1:10255
+        action: replace
+      kubernetes_sd_configs:
+      - role: node
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+    {{- end }}
+    {{- if .Values.config.scrape.kubernetesCadvisor }}
+    - job_name: kubernetes-cadvisor
+      honor_timestamps: true
+      scrape_interval: 1m
+      scrape_timeout: 10s
+      metrics_path: /metrics/cadvisor
+      scheme: https
+      authorization:
+        type: Bearer
+        credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: false
+      follow_redirects: true
+      enable_http2: true
+      relabel_configs:
+      - separator: ;
+        regex: __meta_kubernetes_node_label_(.+)
+        replacement: $1
+        action: labelmap
+      kubernetes_sd_configs:
+      - role: node
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+    {{- end }}
+    {{- if .Values.config.scrape.kubernetesPods }}
+    - job_name: 'kubernetes-pods'
+      scrape_timeout: 20s
+      honor_labels: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - action: drop
+        source_labels: [__meta_kubernetes_pod_container_init]
+        regex: true
+      - source_labels: [ __meta_kubernetes_pod_annotation_prometheus_io_scrape ]
+        action: keep
+        regex: "true"
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: hostname
+
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_metric_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+    {{- end }}
+    {{- if .Values.config.scrape.database }}
+    - job_name: "database-metrics"
+      honor_labels: true
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - action: drop
+        source_labels: [__meta_kubernetes_pod_container_init]
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_label_database_metrics_enabled]
+        action: keep
+        regex: true
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+    {{- end }}
+    {{- if and .Values.config.scrape.blackboxUrl.enable .Values.config.scrape.blackboxUrl.urls }}
+    - job_name: 'blackbox-url'
+      scrape_interval: 1m
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      {{- if and .Values.config.scrape.blackboxUrl.urls .Values.config.scrape.blackboxUrl.urls }} 
+      static_configs:
+      - targets:
+          {{- range .Values.config.scrape.blackboxUrl.urls }}
+          - {{ . }}
+          {{- end }}
+          {{- end }}
+      relabel_configs:
+      - source_labels: [__address__]
+        separator: ;
+        regex: (.*)
+        target_label: __param_target
+        replacement: $1
+        action: replace
+      - source_labels: [__param_target]
+        separator: ;
+        regex: (.*)
+        target_label: instance
+        replacement: $1
+        action: replace
+      - separator: ;
+        regex: (.*)
+        target_label: __address__
+        replacement: {{ .Values.blackbox.name -}}-svc:9115
+        action: replace
+    {{- end }}
 kind: ConfigMap
 metadata:
   labels:

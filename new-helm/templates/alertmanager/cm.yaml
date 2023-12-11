@@ -51,6 +51,6 @@ data:
           `}}
 kind: ConfigMap
 metadata:
-  name: alertmanager-config
-  namespace: mon
+  name: {{ .Values.alertmanager.name -}}-config
+  namespace: {{ .Values.namespace }}
 {{- end }}

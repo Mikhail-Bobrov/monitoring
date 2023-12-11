@@ -2,49 +2,60 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: alertmanager
-  namespace: mon
+  name: {{ .Values.alertmanager.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   podManagementPolicy: OrderedReady
-  replicas: 1
+  replicas: {{ .Values.alertmanager.replicas }}
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: alertmanager
-  serviceName: alertmanager
+      app: {{ .Values.alertmanager.name }}
+  serviceName: {{ .Values.alertmanager.name -}}-svc
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: alertmanager
+        app: {{ .Values.alertmanager.name }}
         stack: monitoring
-      name: alertmanager
+      name: {{ .Values.alertmanager.name }}
     spec:
+      {{- if .Values.alertmanager.security }}
       securityContext:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
         runAsNonRoot: true
+      {{- end }}
       containers:
-      - image: prom/alertmanager:v0.24.0
+      - image: {{ .Values.alertmanager.image.repo -}}/{{- .Values.alertmanager.image.name -}}:{{- .Values.alertmanager.image.tag }}
         args:
-          - "--config.file=/etc/alertmanager/alertmanager.yaml"
-          - "--storage.path=/var/lib/alertmanager/data"
+          - --config.file=/etc/alertmanager/alertmanager.yaml
+          - --storage.path={{- .Values.alertmanager.args.storagePath | default "/var/lib/data" }}
+          {{- if .Values.alertmanager.extArgs }}
+          {{- range .Values.alertmanager.extArgs }}
+          - {{ . }}
+          {{- end }}
+          {{- end }}
         imagePullPolicy: IfNotPresent
-        name: alertmanager
+        name: {{ .Values.alertmanager.name }}
+        {{- if .Values.blackbox.resources }}
         resources:
+        {{- with .Values.blackbox.resources }}
           limits:
-            cpu: 300m
-            memory: 500M
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
           requests:
-            cpu: 50m
-            memory: 50M
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/alertmanager/
           name: configs-files
-        - mountPath: /var/lib/alertmanager/data
+        - mountPath: {{ .Values.alertmanager.args.storagePath | default "/var/lib/data" }}
           name: data-alertmanager
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -56,9 +67,9 @@ spec:
           defaultMode: 420
           sources:
           - configMap:
-              name: alertmanager-config
+              name: {{ .Values.alertmanager.name -}}-config
           - configMap:
-              name: alertmanager-template
+              name: {{ .Values.alertmanager.name -}}-template
   updateStrategy:
     rollingUpdate:
       partition: 0
@@ -69,15 +80,15 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: alertmanager
-      name: data-alertmanager
+        app: {{ .Values.alertmanager.name }}
+      name: data-{{- .Values.alertmanager.name }}
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 1Gi
-      storageClassName: standard
+          storage: {{ .Values.alertmanager.storage.capacity }}
+      storageClassName: {{ .Values.alertmanager.storage.class }}
       volumeMode: Filesystem
     status:
       phase: Pending

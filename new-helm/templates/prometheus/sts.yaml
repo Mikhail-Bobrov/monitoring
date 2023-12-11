@@ -21,47 +21,60 @@ spec:
         app: {{ .Values.prometheus.name }}
         stack: monitoring
     spec:
+      {{- if .Values.prometheus.security }}
       securityContext:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
         runAsNonRoot: true
+      {{- end }}
       containers:
       - args:
         - --web.enable-lifecycle
-        - --storage.tsdb.retention.time=2h
+        - --storage.tsdb.retention.time={{- .Values.prometheus.args.retentionPeriod | default "1h" }}
         - --config.file=/etc/prometheus/prometheus.yml
-        - --storage.tsdb.path=/var/lib/prom/
-        image: prom/prometheus:v2.48.0
+        - --storage.tsdb.path={{- .Values.prometheus.args.storagePath | default "/var/lib/data" }}
+        {{- if .Values.prometheus.extArgs }}
+        {{- range .Values.prometheus.extArgs }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        image: {{ .Values.prometheus.image.repo -}}/{{- .Values.prometheus.image.name -}}:{{- .Values.prometheus.image.tag }}
         imagePullPolicy: IfNotPresent
         name: {{ .Values.prometheus.name }}
+        {{- if .Values.prometheus.resources }}
         resources:
+        {{- with .Values.prometheus.resources }}
           limits:
-            cpu: "1"
-            memory: 1G
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
           requests:
-            cpu: 200m
-            memory: 500Mi
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
+        {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/prometheus/
           name: configs-files
-        - mountPath: /var/lib/prom/
+        - mountPath: {{ .Values.prometheus.args.storagePath | default "/var/lib/data" }}
           name: data-prometheus
       - args:
         - -volume-dir=/etc/prometheus/
         - -webhook-url=http://127.0.0.1:8080/-/reload
-        image: jimmidyson/configmap-reload:v0.9.0
+        image: {{ .Values.prometheus.sidecar.image }}
         imagePullPolicy: IfNotPresent
         name: {{ .Values.prometheus.name -}}-reloader
+        {{- with .Values.prometheus.sidecar.resources }}
         resources:
           limits:
-            cpu: 100m
-            memory: 256Mi
+            cpu: {{ .limit.cpu  | default "100m" }}
+            memory: {{ .limit.memory | default "200Mi" }}
           requests:
-            cpu: 50m
-            memory: 128Mi
+            cpu: {{ .request.cpu | default "50m" }}
+            memory: {{ .request.memory | default "100Mi" }}
+        {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
@@ -79,7 +92,7 @@ spec:
           defaultMode: 420
           sources:
           - configMap:
-              name: prometheus-config
+              name: {{ .Values.prometheus.name -}}-config
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
@@ -88,15 +101,15 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: prometheus
+        app: {{ .Values.prometheus.name }}
       name: data-prometheus
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 25Gi
-      storageClassName: standard
+          storage: {{ .Values.prometheus.storage.capacity }}
+      storageClassName: {{ .Values.prometheus.storage.class }}
       volumeMode: Filesystem
     status:
       phase: Pending

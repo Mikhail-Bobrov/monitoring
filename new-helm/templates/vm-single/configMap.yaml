@@ -55,6 +55,7 @@ data:
     {{- end }}
     {{- if .Values.config.scrape.kubernetesCadvisor }}
     - job_name: kubernetes-cadvisor
+      honor_labels: true
       honor_timestamps: true
       scrape_interval: 1m
       scrape_timeout: 10s
@@ -66,18 +67,15 @@ data:
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         insecure_skip_verify: false
-      follow_redirects: true
-      enable_http2: true
-      relabel_configs:
-      - separator: ;
-        regex: __meta_kubernetes_node_label_(.+)
-        replacement: $1
-        action: labelmap
       kubernetes_sd_configs:
       - role: node
-        kubeconfig_file: ""
         follow_redirects: true
         enable_http2: true
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_node_label_kubernetes_io_hostname]
+        target_label: instance
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: node
     {{- end }}
     {{- if .Values.config.scrape.kubernetesPods }}
     - job_name: 'kubernetes-pods'

@@ -7,7 +7,7 @@ config:
     kubernetesCadvisor: true
     kubernetesKubelet: true
     kubernetesPods: true
-    database: false
+    database: true
     blackboxUrl:
       enable: false
       urls: {}
@@ -52,7 +52,7 @@ blackbox:
 ### Default values  for kube-state-metrics
 
 kubeMetrics:
-  enable: true
+  enable: false
   name: kube-state-metrics
   imagePullSecrets: {}
     ##- name-secret
@@ -79,7 +79,7 @@ kubeMetrics:
 ### Default values for node-exporter
 
 nodeExporter:
-  enable: true
+  enable: false
   name: node-exporter
   imagePullSecrets: {}
     ##- name-secret
@@ -130,7 +130,7 @@ pushgateway:
 
 ### Default values for vm-single
 victoriaSingle:
-  enable: true
+  enable: false
   name: victoria-single
   replicas: 1
   image:
@@ -169,7 +169,36 @@ prometheus:
   enable: false
   name: prometheus
   replicas: 1
-
+  security: true
+  args:
+    retentionPeriod: 2h
+    storagePath: "/var/lib/prom"
+  extArgs: {}
+    # - --extra-args
+  image:
+    repo: prom
+    name: prometheus
+    tag: v2.48.0
+  resources:
+    limit:
+      cpu: 1
+      memory: 1024Mi
+    request:
+      cpu: 200m
+      memory: 500Mi
+  storage:
+    class: standard
+    capacity: 20Gi
+  sidecar:
+    enable: true
+    image: "jimmidyson/configmap-reload:v0.9.0"
+    resources:
+      limit:
+        cpu: 100m
+        memory: 256Mi
+      request:
+        cpu: 50m
+        memory: 128Mi
 
 
 
@@ -264,29 +293,29 @@ grafana:
 #### Default values for alertmanager
 
 alertmanager:
-  enable: false
+  enable: true
   name: alertmanager
+  replicas: 1
+  security: true
+  resources:
+    limit:
+      cpu: 300m
+      memory: 500Mi
+    request:
+      cpu: 100m
+      memory: 150Mi
+  args:
+    storagePath: "/var/lib/alertmanager/data"
+  extArgs: {}
+   #- --extra-args
+  image:
+    repo: prom
+    name: alertmanager
+    tag: v0.24.0
+  storage:
+    class: standard
+    capacity: 1Gi
 
-
-# Default values for prometheus.
-# prometheus:
-#   name: prometheus
-#   image:
-#     repo: prom
-#     name: prometheus
-#     tag: v2.40.2
-#   configManName: prometheus-config
-#   retentionPeriod: 2h
-#   storageClass: lvm-ssd
-#   storagePvc: 1Gi
-#   resources:
-#     limit_cpu: 400m
-#     request_cpu: 100m
-#     limit_memory: 800Mi
-#     request_memory: 424Mi
-# ####### config can be empty/all/federate/my-values (test.yaml file in root direcroty) ############   
-#   config: empty
-  
 
 # Default values for alertmanager
 # alertmanager:

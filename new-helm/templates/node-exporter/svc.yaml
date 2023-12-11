@@ -6,6 +6,7 @@ metadata:
   labels:
     app: {{ .Values.nodeExporter.name }}
   name: {{ .Values.nodeExporter.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
   - name: {{ .Values.nodeExporter.name }}

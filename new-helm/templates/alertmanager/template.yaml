@@ -42,6 +42,6 @@ data:
 kind: ConfigMap
 metadata:
   creationTimestamp: null
-  name: alertmanager-template
-  namespace: mon
+  name: {{ .Values.alertmanager.name -}}-template
+  namespace: {{ .Values.namespace }}
 {{- end }}
