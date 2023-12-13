@@ -79,23 +79,9 @@ spec:
       partition: 0
     type: RollingUpdate
   {{- if eq .Values.config.cluster.type "ha" }}
-  volumeClaimTemplates:
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: {{ .Values.alertmanager.name }}
-      name: data-{{- .Values.alertmanager.name }}
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: {{ .Values.alertmanager.storage.capacity }}
-      storageClassName: {{ .Values.alertmanager.storage.class }}
-      volumeMode: Filesystem
-    status:
-      phase: Pending
+  {{- include "alertmanager-pvc" . }}
+  {{- end }}
+  {{- if eq .Values.config.cluster.type "medium" }}
+  {{- include "alertmanager-pvc" . }}
   {{- end }}
 {{- end }}

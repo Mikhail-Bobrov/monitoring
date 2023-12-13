@@ -6,6 +6,9 @@ data:
     global:
     templates:
     - '/etc/alertmanager/telegram.tmpl'
+    {{- if .Values.config.alertmanager.template.custom }}
+    - '/etc/alertmanager/custom.tmpl'
+    {{- end }}
     receivers:
       {{- if eq .Values.config.alertmanager.config.type "telegram" }}
       - name: telegram_default

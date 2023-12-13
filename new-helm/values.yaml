@@ -4,7 +4,7 @@ namespace: mon
 
 config:
   cluster:
-    type: single  ### single ### medium
+    type: single ### single ### medium  ### ha
   alertmanager:
     config:
       type: telegram #slack e g
@@ -21,7 +21,7 @@ config:
       #   routeLabel:
       #   - severity: warning
     template:
-      custom: false    ## if it true - also going to get customs/alertmanagerTemplate.yaml 
+      custom: false  ## if it true - also going to get customs/alertmanagerTemplate.yaml 
       ## template setting
   scrape:
     kubernetesCadvisor: true
@@ -44,7 +44,7 @@ config:
 ####  database ----> just add label  database_metrics_enabled: true
 
 
-### Default values for blackbox
+### Default values for blackbox/var/lib/alertmanager/data
 
 blackbox:
   enable: false
