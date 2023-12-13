@@ -21,8 +21,8 @@ If release name contains chart name it will be used as a full name.
       - ReadWriteOnce
       resources:
         requests:
-          storage: {{ .Values.alertmanager.storage.capacity }}
-      storageClassName: {{ .Values.alertmanager.storage.class }}
+          storage: {{ .Values.alertmanager.storage.capacity | default "1Gi" }}
+      storageClassName: {{ .Values.storageclass | default .Values.alertmanager.storage.class | default "standard" }}
       volumeMode: Filesystem
     status:
       phase: Pending

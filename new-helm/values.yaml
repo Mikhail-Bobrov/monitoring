@@ -1,6 +1,7 @@
 # # Default non system values
 
 namespace: mon
+#storageclass: customclass
 
 config:
   cluster:
@@ -311,7 +312,7 @@ grafana:
 #### Default values for alertmanager
 
 alertmanager:
-  enable: true
+  enable: false
   name: alertmanager
   replicas: 1
   security: true

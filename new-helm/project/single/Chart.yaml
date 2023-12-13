@@ -1,0 +1,17 @@
+config:
+  cluster:
+    type: single
+  scrape:
+    database: false
+
+kubeMetrics:
+  enable: true
+
+nodeExporter:
+  enable: true
+
+victoriaSingle:
+  enable: true
+
+alertmanager:
+  enable: true

@@ -108,8 +108,8 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: {{ .Values.prometheus.storage.capacity }}
-      storageClassName: {{ .Values.prometheus.storage.class }}
+          storage: {{ .Values.prometheus.storage.capacity | default "1Gi"}}
+      storageClassName: {{ .Values.storageclass | default .Values.prometheus.storage.class | default "standard" }}
       volumeMode: Filesystem
     status:
       phase: Pending

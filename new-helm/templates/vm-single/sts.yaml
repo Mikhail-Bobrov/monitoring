@@ -115,7 +115,7 @@ spec:
         requests:
           storage: {{ .Values.victoriaSingle.storage.capacity | default "10Gi" }}
       volumeMode: Filesystem
-      storageClassName: {{ .Values.victoriaSingle.storage.class }}
+      storageClassName: {{  .Values.storageclass | default .Values.victoriaSingle.storage.class | default "standard" }}
     status:
       phase: Pending
 {{ end }}

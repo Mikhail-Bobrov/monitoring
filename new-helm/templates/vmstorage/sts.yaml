@@ -72,7 +72,7 @@ spec:
       resources:
         requests:
           storage: {{ .Values.vmstorage.storage.capacity | default "1Gi" }}
-      storageClassName: {{ .Values.vmstorage.storage.class }}
+      storageClassName: {{ .Values.storageclass | default .Values.vmstorage.storage.class | default "standard" }}
       volumeMode: Filesystem
     status:
       phase: Pending
