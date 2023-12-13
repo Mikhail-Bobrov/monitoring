@@ -32,6 +32,9 @@ spec:
         args:
           - --config.file=/etc/alertmanager/alertmanager.yaml
           - --storage.path={{- .Values.alertmanager.args.storagePath | default "/var/lib/data" }}
+          {{- if eq .Values.config.cluster.type "ha" }}
+          - --cluster.peer=http://{{- .Values.alertmanager.name -}}-svc.{{- .Values.namespace -}}.svc.cluster.local:9094
+          {{- end }}
           {{- if .Values.alertmanager.extArgs }}
           {{- range .Values.alertmanager.extArgs }}
           - {{ . }}
