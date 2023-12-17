@@ -308,6 +308,18 @@ vmstorage:
 grafana:
   enable: false
   name: grafana
+  replicas: 1
+  resources:
+    limit:
+      cpu: 300m
+      memory: 500Mi
+    request:
+      cpu: 100m
+      memory: 150Mi
+  storage:
+    class: standard
+    capacity: 1Gi
+  loadBalancer: true
 
 #### Default values for alertmanager
 

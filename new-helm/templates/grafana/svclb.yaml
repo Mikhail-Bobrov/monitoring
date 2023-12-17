@@ -1,20 +1,20 @@
-{{- if .Values.grafana.enable }}
+{{- if and  .Values.grafana.enable .Values.grafana.loadBalancer }}
 apiVersion: v1
 kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: grafana
-  name: grafana-lb
-  namespace: mon
+    app: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name -}}-lb
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - name: grafana
+  - name: {{ .Values.grafana.name }}
     port: 3000
     protocol: TCP
     targetPort: 3000
   selector:
-    app: grafana
+    app: {{ .Values.grafana.name }}
   type: LoadBalancer
 status:
   loadBalancer: {}

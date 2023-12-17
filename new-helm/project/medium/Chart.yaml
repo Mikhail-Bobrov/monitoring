@@ -1,0 +1,30 @@
+config:
+  cluster:
+    type: medium
+
+kubeMetrics:
+  enable: true
+
+blackbox:
+  enable: true
+
+pushgateway:
+  enable: true
+
+nodeExporter:
+  enable: true
+
+prometheus:
+  enable: true
+
+vminsert:
+  enable: true
+
+vmselect:
+  enable: true
+
+vmstorage:
+  enable: true
+
+alertmanager:
+  enable: true
