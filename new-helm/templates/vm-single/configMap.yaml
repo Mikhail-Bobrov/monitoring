@@ -35,8 +35,14 @@ data:
       scrape_interval: 1m
       scrape_timeout: 10s
       metrics_path: /metrics
-      scheme: http
+      scheme: https
       follow_redirects: true
+      authorization:
+        type: Bearer
+        credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
       enable_http2: true
       relabel_configs:
       - source_labels: [node]
@@ -53,7 +59,7 @@ data:
         separator: ;
         regex: ([^:]+):.*
         target_label: __address__
-        replacement: $1:10255
+        replacement: $1:10250
         action: replace
       kubernetes_sd_configs:
       - role: node
@@ -74,7 +80,7 @@ data:
         credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecure_skip_verify: false
+        insecure_skip_verify: true
       kubernetes_sd_configs:
       - role: node
         follow_redirects: true

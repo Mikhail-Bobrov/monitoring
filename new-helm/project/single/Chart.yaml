@@ -13,5 +13,8 @@ nodeExporter:
 victoriaSingle:
   enable: true
 
-alertmanager:
+grafana:
   enable: true
+
+#alertmanager:
+  #enable: true
