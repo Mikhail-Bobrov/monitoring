@@ -1,0 +1,203 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki
+  namespace: mon
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: loki
+  serviceName: loki
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: loki
+    spec:
+      containers:
+      - args:
+        - -config.file=/etc/loki/config/loki.yaml
+        - -config.expand-env=true
+        env:
+        - name: S3_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: root-user
+              name: loki-minio
+        - name: S3_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: root-password
+              name: loki-minio
+        image: grafana/loki:3.0.0
+        imagePullPolicy: IfNotPresent
+        name: loki
+        ports:
+        - containerPort: 3100
+          name: http
+          protocol: TCP
+        resources: {}
+        securityContext:
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/loki/config
+          name: config
+        - mountPath: /etc/loki/rules
+          name: rules
+        - mountPath: /loki
+          name: storage
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: loki-config
+        name: config
+      - configMap:
+          defaultMode: 420
+          name: loki-rules
+        name: rules
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      name: storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+      storageClassName: longhorn
+      volumeMode: Filesystem
+    status:
+      phase: Pending
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  namespace: mon
+spec:
+  ports:
+  - name: http
+    port: 3100
+    protocol: TCP
+    targetPort: http
+  selector:
+    name: loki
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+data:
+  loki.yaml: |
+    auth_enabled: false
+    ruler:
+      storage:
+        type: local
+        local:
+          directory: /etc/loki/rules
+      ring:
+        kvstore:
+          store: inmemory
+      rule_path: /loki/ruler
+      alertmanager_url: http://alertmanager-svc.mon.svc.cluster.local:9093
+      enable_api: true
+      enable_alertmanager_v2: true
+    server:
+      http_listen_port: 3100
+      log_level: info
+
+    common:
+      storage:
+        s3:
+          s3: "s3://loki"
+          access_key_id: '${S3_ACCESS_KEY}'
+          secret_access_key: '${S3_SECRET_KEY}'
+          insecure: true
+          s3forcepathstyle: true
+          endpoint: 'loki-minio.mon.svc.cluster.local:9000'
+      ring:
+        kvstore:
+          store: inmemory
+      replication_factor: 1
+
+    ingester:
+      wal:
+        enabled: false
+        dir: /loki/index/wal
+      lifecycler:
+        address: 127.0.0.1
+        ring:
+          kvstore:
+            store: inmemory
+          replication_factor: 1
+      chunk_idle_period: 3m
+      chunk_retain_period: 1m
+
+
+    schema_config:
+      configs:
+      - from: 2020-10-24
+        store: boltdb-shipper
+        object_store: s3
+        schema: v11
+        index:
+          prefix: index_
+          period: 24h
+
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /loki/index
+        cache_location: /loki/index_cache
+      aws:
+        s3: s3://loki
+        bucketnames: "loki"
+        endpoint: 'loki-minio.mon.svc.cluster.local:9000'
+        access_key_id: '${S3_ACCESS_KEY}'
+        secret_access_key: '${S3_SECRET_KEY}'
+        insecure: true
+        s3forcepathstyle: true
+        http_config:
+          idle_conn_timeout: 300s
+          response_header_timeout: 0s
+          insecure_skip_verify: true
+
+    limits_config:
+      retention_period: 14d
+      allow_structured_metadata: false
+      reject_old_samples: true
+      reject_old_samples_max_age: 168h
+
+    compactor:
+      working_directory: /loki/compactor
+kind: ConfigMap
+metadata:
+  name: loki-config
+  namespace: mon
+---
+apiVersion: v1
+data:
+  rules.yaml: ""
+kind: ConfigMap
+metadata:
+  name: loki-rules
+  namespace: mon
