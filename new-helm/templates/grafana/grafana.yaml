@@ -28,7 +28,7 @@ spec:
         runAsUser: 472
       containers:
         - name: {{ .Values.grafana.name }}
-          image: "grafana/grafana:8.3.4"  ##not now
+          image: {{ .Values.grafana.image.repo -}}/{{- .Values.grafana.image.name -}}:{{- .Values.grafana.image.tag }}
           imagePullPolicy: IfNotPresent
           ports:
             - name: {{ .Values.grafana.name }}

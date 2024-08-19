@@ -309,6 +309,10 @@ grafana:
   enable: false
   name: grafana
   replicas: 1
+  image:
+    repo: grafana
+    name: grafana
+    tag: "10.0.0"
   resources:
     limit:
       cpu: 300m
