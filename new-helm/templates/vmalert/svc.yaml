@@ -1,0 +1,19 @@
+{{- if .Values.vmalert.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.vmalert.name }}
+  name: {{ .Values.vmalert.name -}}-svc
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - name: {{ .Values.vmalert.name }}
+    port: 8880
+    protocol: TCP
+    targetPort: 8880
+  selector:
+    app: {{ .Values.vmalert.name }}
+  sessionAffinity: None
+  type: ClusterIP
+{{- end }}

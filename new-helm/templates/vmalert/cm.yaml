@@ -1,0 +1,9 @@
+{{- if .Values.vmalert.enable }}
+apiVersion: v1
+data:
+  rules.yaml: ""
+kind: ConfigMap
+metadata:
+  name: {{ .Values.vmalert.name -}}-config
+  namespace: {{ .Values.namespace }}
+{{- end }}

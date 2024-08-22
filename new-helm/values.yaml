@@ -364,3 +364,7 @@ alertmanager:
 #     storage: 1G
 #     storageClass: standart
 #   serviceLb: true
+
+vmalert:
+  enable: true
+  name: vmalert
